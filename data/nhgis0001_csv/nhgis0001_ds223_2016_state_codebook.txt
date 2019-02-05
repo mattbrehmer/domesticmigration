@@ -1,0 +1,481 @@
+--------------------------------------------------------------------------------
+Codebook for NHGIS data file 'nhgis0001_ds223_2016_state'
+--------------------------------------------------------------------------------
+ 
+Contents
+    - Data Summary
+    - Data Dictionary
+    - Citation and Use
+ 
+Additional documentation on NHGIS data sources is available at: 
+    https://www.nhgis.org/documentation/tabular-data 
+ 
+--------------------------------------------------------------------------------
+Data Summary
+--------------------------------------------------------------------------------
+ 
+Year:             2016
+Geographic level: State
+Dataset:          2016 American Community Survey: 1-Year Data
+   NHGIS code:    2016_ACS1
+   NHGIS ID:      ds223
+Breakdown(s):     Geographic Subarea:
+                     Total area (00)
+Data type(s):     (E) Estimates
+                  (M) Margins of error
+ 
+Tables:
+ 
+1. Geographical Mobility in the Past Year by Age for Current Residence in the United States
+   Universe:    Population 1 year and over in the United States
+   Source code: B07001
+   NHGIS code:  AE5B
+ 
+2. Geographical Mobility in the Past Year by Individual Income in the Past 12 Months (in 2016 Inflation-Adjusted Dollars) for Current Residence in the United States
+   Universe:    Population 15 years and over in the United States
+   Source code: B07010
+   NHGIS code:  AE59
+ 
+--------------------------------------------------------------------------------
+Data Dictionary
+--------------------------------------------------------------------------------
+ 
+Context Fields 
+        GISJOIN:     GIS Join Match Code
+        YEAR:        Data File Year
+        REGIONA:     Region Code
+        DIVISIONA:   Division Code
+        STATE:       State Name
+        STATEA:      State Code
+        COUNTYA:     County Code
+        COUSUBA:     County Subdivision Code
+        PLACEA:      Place Code
+        AIANHHA:     American Indian Area/Alaska Native Area/Hawaiian Home Land Code
+        ANRCA:       Alaska Native Regional Corporation Code
+        CBSAA:       Metropolitan Statistical Area/Micropolitan Statistical Area Code
+        CSAA:        Combined Statistical Area Code
+        METDIVA:     Metropolitan Division Code
+        NECTAA:      New England City and Town Area Code
+        CNECTAA:     Combined New England City and Town Area Code
+        NECTADIVA:   New England City and Town Area Division Code
+        UAA:         Urban Area Code
+        CDCURRA:     Congressional District (2017-2019, 115th Congress) Code
+        SDELMA:      School District (Elementary)/Remainder Code
+        SDSECA:      School District (Secondary)/Remainder Code
+        SDUNIA:      School District (Unified)/Remainder Code
+        PUMA5A:      Public Use Microdata Sample Area (PUMA) Code
+ 
+Data Type (E):
+    Estimates
+ 
+        NAME_E:      Area Name
+ 
+    Table 1:     Geographical Mobility in the Past Year by Age for Current Residence in the United States
+    Universe:    Population 1 year and over in the United States
+    Source code: B07001
+    NHGIS code:  AE5B
+        AE5BE001:    Total
+        AE5BE002:    1 to 4 years
+        AE5BE003:    5 to 17 years
+        AE5BE004:    18 and 19 years
+        AE5BE005:    20 to 24 years
+        AE5BE006:    25 to 29 years
+        AE5BE007:    30 to 34 years
+        AE5BE008:    35 to 39 years
+        AE5BE009:    40 to 44 years
+        AE5BE010:    45 to 49 years
+        AE5BE011:    50 to 54 years
+        AE5BE012:    55 to 59 years
+        AE5BE013:    60 to 64 years
+        AE5BE014:    65 to 69 years
+        AE5BE015:    70 to 74 years
+        AE5BE016:    75 years and over
+        AE5BE017:    Same house 1 year ago
+        AE5BE018:    Same house 1 year ago: 1 to 4 years
+        AE5BE019:    Same house 1 year ago: 5 to 17 years
+        AE5BE020:    Same house 1 year ago: 18 and 19 years
+        AE5BE021:    Same house 1 year ago: 20 to 24 years
+        AE5BE022:    Same house 1 year ago: 25 to 29 years
+        AE5BE023:    Same house 1 year ago: 30 to 34 years
+        AE5BE024:    Same house 1 year ago: 35 to 39 years
+        AE5BE025:    Same house 1 year ago: 40 to 44 years
+        AE5BE026:    Same house 1 year ago: 45 to 49 years
+        AE5BE027:    Same house 1 year ago: 50 to 54 years
+        AE5BE028:    Same house 1 year ago: 55 to 59 years
+        AE5BE029:    Same house 1 year ago: 60 to 64 years
+        AE5BE030:    Same house 1 year ago: 65 to 69 years
+        AE5BE031:    Same house 1 year ago: 70 to 74 years
+        AE5BE032:    Same house 1 year ago: 75 years and over
+        AE5BE033:    Moved within same county
+        AE5BE034:    Moved within same county: 1 to 4 years
+        AE5BE035:    Moved within same county: 5 to 17 years
+        AE5BE036:    Moved within same county: 18 and 19 years
+        AE5BE037:    Moved within same county: 20 to 24 years
+        AE5BE038:    Moved within same county: 25 to 29 years
+        AE5BE039:    Moved within same county: 30 to 34 years
+        AE5BE040:    Moved within same county: 35 to 39 years
+        AE5BE041:    Moved within same county: 40 to 44 years
+        AE5BE042:    Moved within same county: 45 to 49 years
+        AE5BE043:    Moved within same county: 50 to 54 years
+        AE5BE044:    Moved within same county: 55 to 59 years
+        AE5BE045:    Moved within same county: 60 to 64 years
+        AE5BE046:    Moved within same county: 65 to 69 years
+        AE5BE047:    Moved within same county: 70 to 74 years
+        AE5BE048:    Moved within same county: 75 years and over
+        AE5BE049:    Moved from different county within same state
+        AE5BE050:    Moved from different county within same state: 1 to 4 years
+        AE5BE051:    Moved from different county within same state: 5 to 17 years
+        AE5BE052:    Moved from different county within same state: 18 and 19 years
+        AE5BE053:    Moved from different county within same state: 20 to 24 years
+        AE5BE054:    Moved from different county within same state: 25 to 29 years
+        AE5BE055:    Moved from different county within same state: 30 to 34 years
+        AE5BE056:    Moved from different county within same state: 35 to 39 years
+        AE5BE057:    Moved from different county within same state: 40 to 44 years
+        AE5BE058:    Moved from different county within same state: 45 to 49 years
+        AE5BE059:    Moved from different county within same state: 50 to 54 years
+        AE5BE060:    Moved from different county within same state: 55 to 59 years
+        AE5BE061:    Moved from different county within same state: 60 to 64 years
+        AE5BE062:    Moved from different county within same state: 65 to 69 years
+        AE5BE063:    Moved from different county within same state: 70 to 74 years
+        AE5BE064:    Moved from different county within same state: 75 years and over
+        AE5BE065:    Moved from different state
+        AE5BE066:    Moved from different state: 1 to 4 years
+        AE5BE067:    Moved from different state: 5 to 17 years
+        AE5BE068:    Moved from different state: 18 and 19 years
+        AE5BE069:    Moved from different state: 20 to 24 years
+        AE5BE070:    Moved from different state: 25 to 29 years
+        AE5BE071:    Moved from different state: 30 to 34 years
+        AE5BE072:    Moved from different state: 35 to 39 years
+        AE5BE073:    Moved from different state: 40 to 44 years
+        AE5BE074:    Moved from different state: 45 to 49 years
+        AE5BE075:    Moved from different state: 50 to 54 years
+        AE5BE076:    Moved from different state: 55 to 59 years
+        AE5BE077:    Moved from different state: 60 to 64 years
+        AE5BE078:    Moved from different state: 65 to 69 years
+        AE5BE079:    Moved from different state: 70 to 74 years
+        AE5BE080:    Moved from different state: 75 years and over
+        AE5BE081:    Moved from abroad
+        AE5BE082:    Moved from abroad: 1 to 4 years
+        AE5BE083:    Moved from abroad: 5 to 17 years
+        AE5BE084:    Moved from abroad: 18 and 19 years
+        AE5BE085:    Moved from abroad: 20 to 24 years
+        AE5BE086:    Moved from abroad: 25 to 29 years
+        AE5BE087:    Moved from abroad: 30 to 34 years
+        AE5BE088:    Moved from abroad: 35 to 39 years
+        AE5BE089:    Moved from abroad: 40 to 44 years
+        AE5BE090:    Moved from abroad: 45 to 49 years
+        AE5BE091:    Moved from abroad: 50 to 54 years
+        AE5BE092:    Moved from abroad: 55 to 59 years
+        AE5BE093:    Moved from abroad: 60 to 64 years
+        AE5BE094:    Moved from abroad: 65 to 69 years
+        AE5BE095:    Moved from abroad: 70 to 74 years
+        AE5BE096:    Moved from abroad: 75 years and over
+ 
+    Table 2:     Geographical Mobility in the Past Year by Individual Income in the Past 12 Months (in 2016 Inflation-Adjusted Dollars) for Current Residence in the United States
+    Universe:    Population 15 years and over in the United States
+    Source code: B07010
+    NHGIS code:  AE59
+        AE59E001:    Total
+        AE59E002:    No income
+        AE59E003:    With income
+        AE59E004:    With income: $1 to $9,999 or loss
+        AE59E005:    With income: $10,000 to $14,999
+        AE59E006:    With income: $15,000 to $24,999
+        AE59E007:    With income: $25,000 to $34,999
+        AE59E008:    With income: $35,000 to $49,999
+        AE59E009:    With income: $50,000 to $64,999
+        AE59E010:    With income: $65,000 to $74,999
+        AE59E011:    With income: $75,000 or more
+        AE59E012:    Same house 1 year ago
+        AE59E013:    Same house 1 year ago: No income
+        AE59E014:    Same house 1 year ago: With income
+        AE59E015:    Same house 1 year ago: With income: $1 to $9,999 or loss
+        AE59E016:    Same house 1 year ago: With income: $10,000 to $14,999
+        AE59E017:    Same house 1 year ago: With income: $15,000 to $24,999
+        AE59E018:    Same house 1 year ago: With income: $25,000 to $34,999
+        AE59E019:    Same house 1 year ago: With income: $35,000 to $49,999
+        AE59E020:    Same house 1 year ago: With income: $50,000 to $64,999
+        AE59E021:    Same house 1 year ago: With income: $65,000 to $74,999
+        AE59E022:    Same house 1 year ago: With income: $75,000 or more
+        AE59E023:    Moved within same county
+        AE59E024:    Moved within same county: No income
+        AE59E025:    Moved within same county: With income
+        AE59E026:    Moved within same county: With income: $1 to $9,999 or loss
+        AE59E027:    Moved within same county: With income: $10,000 to $14,999
+        AE59E028:    Moved within same county: With income: $15,000 to $24,999
+        AE59E029:    Moved within same county: With income: $25,000 to $34,999
+        AE59E030:    Moved within same county: With income: $35,000 to $49,999
+        AE59E031:    Moved within same county: With income: $50,000 to $64,999
+        AE59E032:    Moved within same county: With income: $65,000 to $74,999
+        AE59E033:    Moved within same county: With income: $75,000 or more
+        AE59E034:    Moved from different county within same state
+        AE59E035:    Moved from different county within same state: No income
+        AE59E036:    Moved from different county within same state: With income
+        AE59E037:    Moved from different county within same state: With income: $1 to $9,999 or loss
+        AE59E038:    Moved from different county within same state: With income: $10,000 to $14,999
+        AE59E039:    Moved from different county within same state: With income: $15,000 to $24,999
+        AE59E040:    Moved from different county within same state: With income: $25,000 to $34,999
+        AE59E041:    Moved from different county within same state: With income: $35,000 to $49,999
+        AE59E042:    Moved from different county within same state: With income: $50,000 to $64,999
+        AE59E043:    Moved from different county within same state: With income: $65,000 to $74,999
+        AE59E044:    Moved from different county within same state: With income: $75,000 or more
+        AE59E045:    Moved from different state
+        AE59E046:    Moved from different state: No income
+        AE59E047:    Moved from different state: With income
+        AE59E048:    Moved from different state: With income: $1 to $9,999 or loss
+        AE59E049:    Moved from different state: With income: $10,000 to $14,999
+        AE59E050:    Moved from different state: With income: $15,000 to $24,999
+        AE59E051:    Moved from different state: With income: $25,000 to $34,999
+        AE59E052:    Moved from different state: With income: $35,000 to $49,999
+        AE59E053:    Moved from different state: With income: $50,000 to $64,999
+        AE59E054:    Moved from different state: With income: $65,000 to $74,999
+        AE59E055:    Moved from different state: With income: $75,000 or more
+        AE59E056:    Moved from abroad
+        AE59E057:    Moved from abroad: No income
+        AE59E058:    Moved from abroad: With income
+        AE59E059:    Moved from abroad: With income: $1 to $9,999 or loss
+        AE59E060:    Moved from abroad: With income: $10,000 to $14,999
+        AE59E061:    Moved from abroad: With income: $15,000 to $24,999
+        AE59E062:    Moved from abroad: With income: $25,000 to $34,999
+        AE59E063:    Moved from abroad: With income: $35,000 to $49,999
+        AE59E064:    Moved from abroad: With income: $50,000 to $64,999
+        AE59E065:    Moved from abroad: With income: $65,000 to $74,999
+        AE59E066:    Moved from abroad: With income: $75,000 or more
+ 
+Data Type (M):
+    Margins of error
+ 
+        NAME_M:      Area Name
+ 
+    Table 1:     Geographical Mobility in the Past Year by Age for Current Residence in the United States
+    Universe:    Population 1 year and over in the United States
+    Source code: B07001
+    NHGIS code:  AE5B
+        AE5BM001:    Total
+        AE5BM002:    1 to 4 years
+        AE5BM003:    5 to 17 years
+        AE5BM004:    18 and 19 years
+        AE5BM005:    20 to 24 years
+        AE5BM006:    25 to 29 years
+        AE5BM007:    30 to 34 years
+        AE5BM008:    35 to 39 years
+        AE5BM009:    40 to 44 years
+        AE5BM010:    45 to 49 years
+        AE5BM011:    50 to 54 years
+        AE5BM012:    55 to 59 years
+        AE5BM013:    60 to 64 years
+        AE5BM014:    65 to 69 years
+        AE5BM015:    70 to 74 years
+        AE5BM016:    75 years and over
+        AE5BM017:    Same house 1 year ago
+        AE5BM018:    Same house 1 year ago: 1 to 4 years
+        AE5BM019:    Same house 1 year ago: 5 to 17 years
+        AE5BM020:    Same house 1 year ago: 18 and 19 years
+        AE5BM021:    Same house 1 year ago: 20 to 24 years
+        AE5BM022:    Same house 1 year ago: 25 to 29 years
+        AE5BM023:    Same house 1 year ago: 30 to 34 years
+        AE5BM024:    Same house 1 year ago: 35 to 39 years
+        AE5BM025:    Same house 1 year ago: 40 to 44 years
+        AE5BM026:    Same house 1 year ago: 45 to 49 years
+        AE5BM027:    Same house 1 year ago: 50 to 54 years
+        AE5BM028:    Same house 1 year ago: 55 to 59 years
+        AE5BM029:    Same house 1 year ago: 60 to 64 years
+        AE5BM030:    Same house 1 year ago: 65 to 69 years
+        AE5BM031:    Same house 1 year ago: 70 to 74 years
+        AE5BM032:    Same house 1 year ago: 75 years and over
+        AE5BM033:    Moved within same county
+        AE5BM034:    Moved within same county: 1 to 4 years
+        AE5BM035:    Moved within same county: 5 to 17 years
+        AE5BM036:    Moved within same county: 18 and 19 years
+        AE5BM037:    Moved within same county: 20 to 24 years
+        AE5BM038:    Moved within same county: 25 to 29 years
+        AE5BM039:    Moved within same county: 30 to 34 years
+        AE5BM040:    Moved within same county: 35 to 39 years
+        AE5BM041:    Moved within same county: 40 to 44 years
+        AE5BM042:    Moved within same county: 45 to 49 years
+        AE5BM043:    Moved within same county: 50 to 54 years
+        AE5BM044:    Moved within same county: 55 to 59 years
+        AE5BM045:    Moved within same county: 60 to 64 years
+        AE5BM046:    Moved within same county: 65 to 69 years
+        AE5BM047:    Moved within same county: 70 to 74 years
+        AE5BM048:    Moved within same county: 75 years and over
+        AE5BM049:    Moved from different county within same state
+        AE5BM050:    Moved from different county within same state: 1 to 4 years
+        AE5BM051:    Moved from different county within same state: 5 to 17 years
+        AE5BM052:    Moved from different county within same state: 18 and 19 years
+        AE5BM053:    Moved from different county within same state: 20 to 24 years
+        AE5BM054:    Moved from different county within same state: 25 to 29 years
+        AE5BM055:    Moved from different county within same state: 30 to 34 years
+        AE5BM056:    Moved from different county within same state: 35 to 39 years
+        AE5BM057:    Moved from different county within same state: 40 to 44 years
+        AE5BM058:    Moved from different county within same state: 45 to 49 years
+        AE5BM059:    Moved from different county within same state: 50 to 54 years
+        AE5BM060:    Moved from different county within same state: 55 to 59 years
+        AE5BM061:    Moved from different county within same state: 60 to 64 years
+        AE5BM062:    Moved from different county within same state: 65 to 69 years
+        AE5BM063:    Moved from different county within same state: 70 to 74 years
+        AE5BM064:    Moved from different county within same state: 75 years and over
+        AE5BM065:    Moved from different state
+        AE5BM066:    Moved from different state: 1 to 4 years
+        AE5BM067:    Moved from different state: 5 to 17 years
+        AE5BM068:    Moved from different state: 18 and 19 years
+        AE5BM069:    Moved from different state: 20 to 24 years
+        AE5BM070:    Moved from different state: 25 to 29 years
+        AE5BM071:    Moved from different state: 30 to 34 years
+        AE5BM072:    Moved from different state: 35 to 39 years
+        AE5BM073:    Moved from different state: 40 to 44 years
+        AE5BM074:    Moved from different state: 45 to 49 years
+        AE5BM075:    Moved from different state: 50 to 54 years
+        AE5BM076:    Moved from different state: 55 to 59 years
+        AE5BM077:    Moved from different state: 60 to 64 years
+        AE5BM078:    Moved from different state: 65 to 69 years
+        AE5BM079:    Moved from different state: 70 to 74 years
+        AE5BM080:    Moved from different state: 75 years and over
+        AE5BM081:    Moved from abroad
+        AE5BM082:    Moved from abroad: 1 to 4 years
+        AE5BM083:    Moved from abroad: 5 to 17 years
+        AE5BM084:    Moved from abroad: 18 and 19 years
+        AE5BM085:    Moved from abroad: 20 to 24 years
+        AE5BM086:    Moved from abroad: 25 to 29 years
+        AE5BM087:    Moved from abroad: 30 to 34 years
+        AE5BM088:    Moved from abroad: 35 to 39 years
+        AE5BM089:    Moved from abroad: 40 to 44 years
+        AE5BM090:    Moved from abroad: 45 to 49 years
+        AE5BM091:    Moved from abroad: 50 to 54 years
+        AE5BM092:    Moved from abroad: 55 to 59 years
+        AE5BM093:    Moved from abroad: 60 to 64 years
+        AE5BM094:    Moved from abroad: 65 to 69 years
+        AE5BM095:    Moved from abroad: 70 to 74 years
+        AE5BM096:    Moved from abroad: 75 years and over
+ 
+    Table 2:     Geographical Mobility in the Past Year by Individual Income in the Past 12 Months (in 2016 Inflation-Adjusted Dollars) for Current Residence in the United States
+    Universe:    Population 15 years and over in the United States
+    Source code: B07010
+    NHGIS code:  AE59
+        AE59M001:    Total
+        AE59M002:    No income
+        AE59M003:    With income
+        AE59M004:    With income: $1 to $9,999 or loss
+        AE59M005:    With income: $10,000 to $14,999
+        AE59M006:    With income: $15,000 to $24,999
+        AE59M007:    With income: $25,000 to $34,999
+        AE59M008:    With income: $35,000 to $49,999
+        AE59M009:    With income: $50,000 to $64,999
+        AE59M010:    With income: $65,000 to $74,999
+        AE59M011:    With income: $75,000 or more
+        AE59M012:    Same house 1 year ago
+        AE59M013:    Same house 1 year ago: No income
+        AE59M014:    Same house 1 year ago: With income
+        AE59M015:    Same house 1 year ago: With income: $1 to $9,999 or loss
+        AE59M016:    Same house 1 year ago: With income: $10,000 to $14,999
+        AE59M017:    Same house 1 year ago: With income: $15,000 to $24,999
+        AE59M018:    Same house 1 year ago: With income: $25,000 to $34,999
+        AE59M019:    Same house 1 year ago: With income: $35,000 to $49,999
+        AE59M020:    Same house 1 year ago: With income: $50,000 to $64,999
+        AE59M021:    Same house 1 year ago: With income: $65,000 to $74,999
+        AE59M022:    Same house 1 year ago: With income: $75,000 or more
+        AE59M023:    Moved within same county
+        AE59M024:    Moved within same county: No income
+        AE59M025:    Moved within same county: With income
+        AE59M026:    Moved within same county: With income: $1 to $9,999 or loss
+        AE59M027:    Moved within same county: With income: $10,000 to $14,999
+        AE59M028:    Moved within same county: With income: $15,000 to $24,999
+        AE59M029:    Moved within same county: With income: $25,000 to $34,999
+        AE59M030:    Moved within same county: With income: $35,000 to $49,999
+        AE59M031:    Moved within same county: With income: $50,000 to $64,999
+        AE59M032:    Moved within same county: With income: $65,000 to $74,999
+        AE59M033:    Moved within same county: With income: $75,000 or more
+        AE59M034:    Moved from different county within same state
+        AE59M035:    Moved from different county within same state: No income
+        AE59M036:    Moved from different county within same state: With income
+        AE59M037:    Moved from different county within same state: With income: $1 to $9,999 or loss
+        AE59M038:    Moved from different county within same state: With income: $10,000 to $14,999
+        AE59M039:    Moved from different county within same state: With income: $15,000 to $24,999
+        AE59M040:    Moved from different county within same state: With income: $25,000 to $34,999
+        AE59M041:    Moved from different county within same state: With income: $35,000 to $49,999
+        AE59M042:    Moved from different county within same state: With income: $50,000 to $64,999
+        AE59M043:    Moved from different county within same state: With income: $65,000 to $74,999
+        AE59M044:    Moved from different county within same state: With income: $75,000 or more
+        AE59M045:    Moved from different state
+        AE59M046:    Moved from different state: No income
+        AE59M047:    Moved from different state: With income
+        AE59M048:    Moved from different state: With income: $1 to $9,999 or loss
+        AE59M049:    Moved from different state: With income: $10,000 to $14,999
+        AE59M050:    Moved from different state: With income: $15,000 to $24,999
+        AE59M051:    Moved from different state: With income: $25,000 to $34,999
+        AE59M052:    Moved from different state: With income: $35,000 to $49,999
+        AE59M053:    Moved from different state: With income: $50,000 to $64,999
+        AE59M054:    Moved from different state: With income: $65,000 to $74,999
+        AE59M055:    Moved from different state: With income: $75,000 or more
+        AE59M056:    Moved from abroad
+        AE59M057:    Moved from abroad: No income
+        AE59M058:    Moved from abroad: With income
+        AE59M059:    Moved from abroad: With income: $1 to $9,999 or loss
+        AE59M060:    Moved from abroad: With income: $10,000 to $14,999
+        AE59M061:    Moved from abroad: With income: $15,000 to $24,999
+        AE59M062:    Moved from abroad: With income: $25,000 to $34,999
+        AE59M063:    Moved from abroad: With income: $35,000 to $49,999
+        AE59M064:    Moved from abroad: With income: $50,000 to $64,999
+        AE59M065:    Moved from abroad: With income: $65,000 to $74,999
+        AE59M066:    Moved from abroad: With income: $75,000 or more
+ 
+--------------------------------------------------------------------------------
+Citation and Use of NHGIS Data
+--------------------------------------------------------------------------------
+ 
+All persons are granted a limited license to use this documentation and the
+accompanying data, subject to the following conditions:
+
+* REDISTRIBUTION: You will not redistribute the data without permission.
+
+  You may publish a subset of the data to meet journal requirements for accessing 
+  data related to a particular publication. Contact us for permission for any other 
+  redistribution; we will consider requests for free and commercial redistribution.
+
+* CITATION: You will cite NHGIS appropriately.
+
+    * Publications and research reports employing NHGIS data (either tabular or GIS) 
+      should include the following citation:
+
+        Steven Manson, Jonathan Schroeder, David Van Riper, and Steven Ruggles. 
+        IPUMS National Historical Geographic Information System: Version 13.0 
+        [Database]. Minneapolis: University of Minnesota. 2018. 
+        http://doi.org/10.18128/D050.V13.0
+
+    * Publications and research reports employing school attendance areas data 
+      (either tabular or GIS) must cite it appropriately. The citation should 
+      include the following:
+
+        The College of William and Mary and the Minnesota Population Center.
+        School Attendance Boundary Information System (SABINS): Version 1.0.
+        Minneapolis, MN: University of Minnesota 2011.
+
+    * For policy briefs, online resources, or articles in the popular press, we 
+      recommend that you cite the use of NHGIS data as follows:
+
+        IPUMS NHGIS, University of Minnesota, www.nhgis.org.
+
+    * If possible, citations involving school attendance areas should also include
+      the URL for the SABINS site:
+
+        http://www.sabinsdata.org/.
+
+These terms of use are a legally binding agreement. You can use the data only in 
+accordance with these terms, and any other use is a violation of the agreement. 
+Violations may result in revocation of the agreement and prohibition from using other 
+IPUMS data. If IPUMS or our partners are harmed from your violation, you are 
+responsible for all damages, including reasonable attorney's fees and expenses.
+        
+In addition, we request that users send us a copy of any publications, research
+reports, or educational material making use of the data or documentation.
+
+Send electronic material to: nhgis@umn.edu
+
+Printed matter should be sent to:
+
+    IPUMS NHGIS
+    Institute for Social Research and Data Innovation
+    University of Minnesota
+    50 Willey Hall
+    225 19th Ave S
+    Minneapolis, MN 55455
