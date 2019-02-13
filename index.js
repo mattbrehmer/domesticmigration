@@ -1,9 +1,12 @@
 var globals = {
   tilemap_g: undefined,
   tilemap_instance: undefined,
+  tilemap_g_2: undefined,
+  tilemap_instance_2: undefined,
   svg_1: undefined,
-  h: undefined,
-  w: undefined,
+  svg_2: undefined,
+  svg_w: undefined,
+  svg_h: undefined,
   stateCodesWithNames: undefined,
   topojson: undefined,
   d3: undefined,
@@ -21,7 +24,9 @@ var globals = {
 function scale (scaleFactor) {
   return d3.geoTransform({
     point: function(x, y) {
-      this.stream.point(scaleFactor * (x - globals.tile_bbox[0]), scaleFactor * ((globals.tile_bbox[3] - globals.tile_bbox[1]) + -1 * (y - globals.tile_bbox[1])));
+      this.stream.point(
+        0.975 * scaleFactor * (x - globals.tile_bbox[0]) + (0.0125 * globals.svg_w), 
+        0.975 * scaleFactor * ((globals.tile_bbox[3] - globals.tile_bbox[1]) + -1 * (y - globals.tile_bbox[1])) + (0.0125 * globals.svg_h));
     }
   });
 }
@@ -29,15 +34,19 @@ function scale (scaleFactor) {
 function loadTiles() {
 
   globals.svg_1 = d3.select('#svg_1');
-
   globals.tilemap_g = globals.svg_1.append('g')
+  .attr('id','tilemap_g');
+
+  globals.svg_2 = d3.select('#svg_2');
+  globals.tilemap_g_2 = globals.svg_2.append('g')
   .attr('id','tilemap_g');
   
   d3.json('tiles-topo-us.json', function showData(error, tilegram) {
     globals.tiles = topojson.feature(tilegram, tilegram.objects.tiles);
     globals.tile_bbox = tilegram.bbox;
     
-    globals.scaling_factor = globals.w / (globals.tile_bbox[2] - globals.tile_bbox[0]);
+    globals.scaling_factor = globals.svg_w / (globals.tile_bbox[2] - globals.tile_bbox[0]);
+    globals.svg_h = globals.scaling_factor * (globals.tile_bbox[3] - globals.tile_bbox[1]);
 
     globals.path = d3.geoPath()
     .projection(scale(globals.scaling_factor)); 
@@ -54,6 +63,7 @@ function loadTiles() {
   checkExist = setInterval(function() {
     if (globals.tiles != undefined) {        
       globals.tilemap_g.datum(globals.tiles);
+      globals.tilemap_g_2.datum(globals.tiles);
       render();    
 
       clearInterval(checkExist);
@@ -61,21 +71,27 @@ function loadTiles() {
   }, 100); // check every 100ms
 
   globals.tilemap_instance = tilemap();
+  globals.tilemap_instance_2 = tilemap();
   
 }
 
 function render() {
 
-  globals.svg_1.style('height',globals.h + 'px')
-  .style('width',globals.w + 'px');
+  globals.svg_1.style('width',globals.svg_w + 'px')
+               .style('height',globals.svg_h + 'px');
+
+  globals.svg_2.style('width',globals.svg_w + 'px')
+               .style('height',globals.svg_h + 'px');
 
   globals.tilemap_g.call(globals.tilemap_instance);
+  globals.tilemap_g_2.call(globals.tilemap_instance);
 
 }
 
 window.addEventListener('load', function() {
-  globals.w = window.innerWidth;
-  globals.h = window.innerHeight;
+  var p = d3.select('.content').style('width').indexOf('p');
+  globals.svg_w = +d3.select('.content').style('width').substr(0,p);
+  
   globals.stateCodesWithNames = window.stateCodesWithNames;
   globals.topojson = window.topojson;
   globals.d3 = window.d3;
@@ -89,10 +105,11 @@ window.addEventListener('load', function() {
 });
 
 window.onresize = function(e) {
-  globals.w = window.innerWidth;
-  globals.h = window.innerHeight;
+  var p = d3.select('.content').style('width').indexOf('p');
+  globals.svg_w = +d3.select('.content').style('width').substr(0,p);
 
-  globals.scaling_factor = globals.w / (globals.tile_bbox[2] - globals.tile_bbox[0]);
+  globals.scaling_factor = globals.svg_w / (globals.tile_bbox[2] - globals.tile_bbox[0]);
+  globals.svg_h = globals.scaling_factor * (globals.tile_bbox[3] - globals.tile_bbox[1]);
 
   globals.path = d3.geoPath()
   .projection(scale(globals.scaling_factor)); 

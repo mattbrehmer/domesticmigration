@@ -26,7 +26,7 @@ tilemap = function() {
       //   return linear(colorValues[i]);
       // })
       .attr('stroke', '#130C0E')
-      .attr('stroke-width', 4)
+      .attr('stroke-width', globals.scaling_factor * 4)
       .on('click', function (d, i) {
           console.log(d);
           console.log('stateCodes[i]', globals.stateCodes[i]);
@@ -41,7 +41,7 @@ tilemap = function() {
         return 'translate(' + globals.path.centroid(d) + ')';
       })
       .attr('dy', '.35em')
-      .style('font-size', globals.scaling_factor + 'em')
+      .style('font-size', (globals.scaling_factor * 1.25) + 'em')
       .text(function (d) {
         return d.properties.state;
       });
