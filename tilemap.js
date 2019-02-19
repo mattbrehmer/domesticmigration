@@ -27,10 +27,11 @@ tilemap = function() {
       // })
       .attr('stroke', '#130C0E')
       .attr('stroke-width', globals.scaling_factor * 4)
-      .on('click', function (d, i) {
-          console.log(d);
-          console.log('stateCodes[i]', globals.stateCodes[i]);
-          console.log('stateNames[i]', globals.stateNames[i]);
+      .on('touchstart', function (d, i) {
+        d3.event.preventDefault(); 
+        console.log(d);
+        console.log('stateCodes[i]', globals.stateCodes[i]);
+        console.log('stateNames[i]', globals.stateNames[i]);
       });
 
       tiles_enter.append('text')

@@ -1,23 +1,30 @@
 var globals = {
-  tilemap_g: undefined,
-  tilemap_instance: undefined,
-  tilemap_g_2: undefined,
-  tilemap_instance_2: undefined,
+  svg_0: undefined,
   svg_1: undefined,
   svg_2: undefined,
+  tilemap_g_0: undefined,
+  tilemap_instance_0: undefined,
+  tilemap_g_1: undefined,
+  tilemap_instance_1: undefined,
+  tilemap_g_2: undefined,
+  tilemap_instance_2: undefined,
   svg_w: undefined,
   svg_h: undefined,
+  double_svg_w: undefined,
+  double_svg_h: undefined,
   stateCodesWithNames: undefined,
   topojson: undefined,
   d3: undefined,
   tilemap: undefined,
+  paired_tilemap: undefined,
   tile_bbox: undefined,
   _: undefined,
   tiles: undefined,
   path: undefined,
   stateCodes: undefined,
   stateNames: undefined,
-  scaling_factor: undefined
+  scaling_factor: undefined,
+  orientation_changed: undefined
   //colorValues: undefined
 };
 
@@ -33,13 +40,17 @@ function scale (scaleFactor) {
   
 function loadTiles() {
 
+  globals.svg_0 = d3.select('#svg_0');
+  globals.tilemap_g_0 = globals.svg_0.append('g')
+  .attr('id','tilemap_g_0');
+
   globals.svg_1 = d3.select('#svg_1');
-  globals.tilemap_g = globals.svg_1.append('g')
-  .attr('id','tilemap_g');
+  globals.tilemap_g_1 = globals.svg_1.append('g')
+  .attr('id','tilemap_g_1');
 
   globals.svg_2 = d3.select('#svg_2');
   globals.tilemap_g_2 = globals.svg_2.append('g')
-  .attr('id','tilemap_g');
+  .attr('id','tilemap_g_2');
   
   d3.json('tiles-topo-us.json', function showData(error, tilegram) {
     globals.tiles = topojson.feature(tilegram, tilegram.objects.tiles);
@@ -47,6 +58,8 @@ function loadTiles() {
     
     globals.scaling_factor = globals.svg_w / (globals.tile_bbox[2] - globals.tile_bbox[0]);
     globals.svg_h = globals.scaling_factor * (globals.tile_bbox[3] - globals.tile_bbox[1]);
+
+    globals.double_svg_h = window.innerWidth < 506 ? (globals.svg_h * 2) : globals.svg_h;
 
     globals.path = d3.geoPath()
     .projection(scale(globals.scaling_factor)); 
@@ -60,9 +73,10 @@ function loadTiles() {
     });
   });
 
-  checkExist = setInterval(function() {
+  var checkExist = setInterval(function() {
     if (globals.tiles != undefined) {        
-      globals.tilemap_g.datum(globals.tiles);
+      globals.tilemap_g_0.datum(globals.tiles);
+      globals.tilemap_g_1.datum(globals.tiles);
       globals.tilemap_g_2.datum(globals.tiles);
       render();    
 
@@ -70,12 +84,16 @@ function loadTiles() {
     }
   }, 100); // check every 100ms
 
-  globals.tilemap_instance = tilemap();
+  globals.tilemap_instance_0 = paired_tilemap();
+  globals.tilemap_instance_1 = tilemap();
   globals.tilemap_instance_2 = tilemap();
   
 }
 
 function render() {
+
+  globals.svg_0.style('width',globals.double_svg_w + 'px')
+               .style('height',globals.double_svg_h + 'px');
 
   globals.svg_1.style('width',globals.svg_w + 'px')
                .style('height',globals.svg_h + 'px');
@@ -83,19 +101,24 @@ function render() {
   globals.svg_2.style('width',globals.svg_w + 'px')
                .style('height',globals.svg_h + 'px');
 
-  globals.tilemap_g.call(globals.tilemap_instance);
-  globals.tilemap_g_2.call(globals.tilemap_instance);
+  globals.tilemap_g_0.call(globals.tilemap_instance_0);             
+  globals.tilemap_g_1.call(globals.tilemap_instance_1);
+  globals.tilemap_g_2.call(globals.tilemap_instance_2);
 
 }
 
 window.addEventListener('load', function() {
-  var p = d3.select('.content').style('width').indexOf('p');
-  globals.svg_w = +d3.select('.content').style('width').substr(0,p);
-  
+  var single_w = d3.select('.single').style('width').indexOf('p');
+  globals.svg_w = +d3.select('.single').style('width').substr(0,single_w);
+
+  var double_w = d3.select('.double').style('width').indexOf('p');
+  globals.double_svg_w = +d3.select('.double').style('width').substr(0,double_w);
+ 
   globals.stateCodesWithNames = window.stateCodesWithNames;
   globals.topojson = window.topojson;
   globals.d3 = window.d3;
   globals.tilemap = window.tilemap;
+  globals.paired_tilemap = window.paired_tilemap;
   globals._ = window._;
   globals.stateCodes = [];
   globals.stateNames = [];
@@ -105,8 +128,12 @@ window.addEventListener('load', function() {
 });
 
 window.onresize = function(e) {
-  var p = d3.select('.content').style('width').indexOf('p');
-  globals.svg_w = +d3.select('.content').style('width').substr(0,p);
+
+  var single_w = d3.select('.single').style('width').indexOf('p');
+  globals.svg_w = +d3.select('.single').style('width').substr(0,single_w);
+
+  var double_w = d3.select('.double').style('width').indexOf('p');
+  globals.double_svg_w = +d3.select('.double').style('width').substr(0,double_w);
 
   globals.scaling_factor = globals.svg_w / (globals.tile_bbox[2] - globals.tile_bbox[0]);
   globals.svg_h = globals.scaling_factor * (globals.tile_bbox[3] - globals.tile_bbox[1]);
@@ -114,5 +141,24 @@ window.onresize = function(e) {
   globals.path = d3.geoPath()
   .projection(scale(globals.scaling_factor)); 
 
-  render();
+  
+  var checkOrientation = setInterval(function() {
+
+    globals.orientation_changed = false;
+    if (window.innerWidth < 506 & globals.double_svg_h == globals.svg_h) {
+      orientation_changed = false;
+      globals.double_svg_h = (globals.svg_h * 2);    
+      render();
+    }
+    else if (window.innerWidth >= 506 && globals.double_svg_h != globals.svg_h) {
+      orientation_changed = false;
+      globals.double_svg_h = globals.svg_h; 
+      render(); 
+    }
+    else {
+      orientation_changed = true;
+      clearInterval(checkOrientation);
+    }
+  }, 100);
+
 };

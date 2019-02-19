@@ -21,15 +21,21 @@ body {
   pointer-events: none;
 }
 
-.content {
+.single {
   display: block;
   margin: 1.25%;
   width: 97.5%;
 }
 @media screen and (min-width: 506px) {
-  .content {
+  .single {
     float: left;
     width: 48.125%;
     margin-right: 0%;
   }
+}
+
+.double {
+  display: block;
+  margin: 1.25%;
+  width: 97.5%;
 }

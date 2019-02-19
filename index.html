@@ -9,6 +9,9 @@
 	<link href="flaticon.css" rel="stylesheet">		
 	<link href="https://fonts.googleapis.com/css?family=Lato:300,400,500,600,800" rel="stylesheet" type="text/css">
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta name="HandheldFriendly" content="true" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes">
 	<meta name="description" content="Domestic Migration">
 	<meta name="viewport" content="initial-scale=1, width=device-width">
 	<meta name="author" content="Matthew Brehmer">
@@ -20,17 +23,21 @@
 <script type='text/javascript' src='//cdn.jsdelivr.net/lodash/4.16.6/lodash.min.js'></script>
 <script type='text/javascript' src='stateCodes.js'></script>
 
-<body>
+<body ontouchstart="">
 
-	<div class="content">
+	<div class="double">
+		<svg id='svg_0'></svg>
+	</div>
+	<div class="single">
 		<svg id='svg_1'></svg>
 	</div>
-	<div class="content">
+	<div class="single">
 		<svg id='svg_2'></svg>
 	</div>
 
 </body>
 
 <script src="tilemap.js"></script>
+<script src="paired_tilemap.js"></script>
 <script src="index.js"></script>
  
