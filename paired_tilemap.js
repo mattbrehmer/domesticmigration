@@ -27,11 +27,67 @@ paired_tilemap = function() {
       // })
       .attr('stroke', '#130C0E')
       .attr('stroke-width', globals.scaling_factor * 4)
-      .on('touchstart', function (d, i) {
+      .on('click', function (d, i) {
+        
         d3.event.preventDefault(); 
-        console.log(d);
-        console.log('stateCodes[i]', globals.stateCodes[i]);
-        console.log('stateNames[i]', globals.stateNames[i]);
+
+        d3.selectAll('.arcs').remove();
+        d3.selectAll('.origin_tile').select('path').attr('stroke', '#130C0E');
+        d3.selectAll('.dest_tile').select('path').attr('stroke', '#130C0E');
+        
+        var arcdata = [];
+        var links = _.sampleSize(globals.stateCodes,5);
+        for (var j = 0; j < links.length; j++){
+          arcdata.push({
+            origin: globals.path.centroid(d),
+            dest: globals.path.centroid(d3.select('#dest_tile_' + links[j])._groups[0][0].__data__)
+          });
+          if (globals.double_svg_h > globals.double_svg_w) {
+            arcdata[j].dest[1] = arcdata[j].dest[1] + globals.svg_h;
+          }
+          else {
+            arcdata[j].dest[0] = arcdata[j].dest[0] + globals.svg_w;
+          }
+        }
+
+        console.log({
+          'd': d,
+          'stateCodes[i]': globals.stateCodes[i],
+          'stateNames[i]': globals.stateNames[i],
+          'centroid(d)': globals.path.centroid(d),
+          'arcdata': arcdata
+        });
+
+        var arc_links = this_paired_tilemap.append('g')
+        .attr('class','arcs');
+
+        arc_links.selectAll('path')
+        .data(arcdata)
+        .enter()
+        .append('path')
+        .attr('class','arc')
+        .attr('d', function(d) {
+          console.log(d);
+          var dx = d.dest[0] - d.origin[0],
+					    dy = d.dest[1] - d.origin[1],
+              dr = Math.sqrt(dx * dx + dy * dy)*5;
+          var west_of_source = (d.dest[0] - d.origin[0]) < 0;
+          if (west_of_source) {
+            return "M" + d.dest[0] + "," + d.dest[1] + "A" + dr + "," + dr + " 0 0,1 " + d.origin[0] + "," + d.origin[1];
+          }
+          return "M" + d.origin[0] + "," + d.origin[1] + "A" + dr + "," + dr + " 0 0,1 " + d.dest[0] + "," + d.dest[1];
+        });
+
+        d3.select('#origin_tile_' + globals.stateCodes[i]).select('path').attr('stroke', 'tomato');
+        d3.select('#origin_tile_' + globals.stateCodes[i]).moveToFront();
+
+        for (var k = 0; k < links.length; k++){
+          d3.select('#dest_tile_' + links[k]).select('path')
+          .attr('stroke', 'tomato');       
+          
+          d3.select('#dest_tile_' + links[k]).moveToFront();
+        }
+
       });
 
       origin_tiles_enter.append('text')
@@ -88,9 +144,12 @@ paired_tilemap = function() {
       .attr('stroke-width', globals.scaling_factor * 4)
       .on('touchstart', function (d, i) {
         d3.event.preventDefault(); 
-        console.log(d);
-        console.log('stateCodes[i]', globals.stateCodes[i]);
-        console.log('stateNames[i]', globals.stateNames[i]);
+        console.log({
+          'd': d,
+          'stateCodes[i]': globals.stateCodes[i],
+          'stateNames[i]': globals.stateNames[i],
+          'centroid(d)': globals.path.centroid(d)
+        });
       });
 
       dest_tiles_enter.append('text')
@@ -123,6 +182,12 @@ paired_tilemap = function() {
 
       dest_tiles.exit()
       .remove();
+
+      d3.selection.prototype.moveToFront = function() {  
+        return this.each(function(){
+          this.parentNode.appendChild(this);
+        });
+      };
 
     });
   }

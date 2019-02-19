@@ -7,10 +7,6 @@ body {
   color: #fff;
 }
 
-.border:hover {
-  cursor: pointer;
-  opacity: 0.7;
-}
 .state-label {
   fill: #fff;
   fill-opacity: .9;
@@ -26,7 +22,7 @@ body {
   margin: 1.25%;
   width: 97.5%;
 }
-@media screen and (min-width: 506px) {
+@media screen and (min-width: 506px) { 
   .single {
     float: left;
     width: 48.125%;
@@ -38,4 +34,11 @@ body {
   display: block;
   margin: 1.25%;
   width: 97.5%;
+}
+
+.arc {
+  stroke-width: 2px;
+  stroke: tomato;
+  pointer-events: none;
+  fill: none;
 }
