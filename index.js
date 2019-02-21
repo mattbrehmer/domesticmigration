@@ -105,11 +105,44 @@ function render() {
   globals.tilemap_g_1.call(globals.tilemap_instance_1);
   globals.tilemap_g_2.call(globals.tilemap_instance_2);
 
-  d3.selectAll('.arc').transition()
+  var animation_rates = _.sampleSize([1,2,3,4,5],5);
+
+  d3.selectAll('.outgoing_arc').transition()
   .duration(100)
+  .style('animation',function(d,i) {
+    var origin_state = globals.path.centroid(d3.select('#origin_tile_' + d.origin_state)._groups[0][0].__data__),
+        dest_state = globals.path.centroid(d3.select('#origin_tile_' + d.dest_state)._groups[0][0].__data__);
+
+    var west_of_source = (dest_state[0] - origin_state[0]) < 0;
+    var south_of_source = (dest_state[1] - origin_state[1]) > 0;
+    
+    if (west_of_source || south_of_source) {
+      return 'reverseflow ' + animation_rates[i] + 's linear infinite';
+    }
+    else {
+      return 'flow ' + animation_rates[i] + 's linear infinite';
+    }
+  })
+  .style('-webkit-animation',function(d,i) {
+    var origin_state = globals.path.centroid(d3.select('#origin_tile_' + d.origin_state)._groups[0][0].__data__),
+        dest_state = globals.path.centroid(d3.select('#origin_tile_' + d.dest_state)._groups[0][0].__data__);
+
+    var west_of_source = (dest_state[0] - origin_state[0]) < 0;
+    var south_of_source = (dest_state[1] - origin_state[1]) > 0;
+
+    if (west_of_source || south_of_source) {
+      return 'reverseflow ' + animation_rates[i] + 's linear infinite';
+    }
+    else {
+      return 'flow ' + animation_rates[i] + 's linear infinite';
+    }
+  })
   .attr('d', function(d) {
     var origin_state = globals.path.centroid(d3.select('#origin_tile_' + d.origin_state)._groups[0][0].__data__),
         dest_state = globals.path.centroid(d3.select('#origin_tile_' + d.dest_state)._groups[0][0].__data__);
+
+    var west_of_source = (dest_state[0] - origin_state[0]) < 0;
+    var south_of_source = (dest_state[1] - origin_state[1]) > 0;
 
     dest_state[0] = globals.double_svg_h > globals.double_svg_w ? dest_state[0] : dest_state[0] + globals.svg_w;
 
@@ -118,12 +151,60 @@ function render() {
     var dx = dest_state[0] - origin_state[0],
         dy = dest_state[1] - origin_state[1],
         dr = Math.sqrt(dx * dx + dy * dy)*2;
-    var west_of_source = (dest_state[0] - origin_state[0]) < 0;
-    var south_of_source = (dest_state[1] - origin_state[1]) > 0;
-    if (globals.double_svg_h > globals.double_svg_w && west_of_source || globals.double_svg_h < globals.double_svg_w && south_of_source) {
+    if (west_of_source || south_of_source) {
       return "M" + dest_state[0] + "," + dest_state[1] + "A" + dr + "," + dr + " 0 0,1 " + origin_state[0] + "," + origin_state[1];
     }
     return "M" + origin_state[0] + "," + origin_state[1] + "A" + dr + "," + dr + " 0 0,1 " + dest_state[0] + "," + dest_state[1];
+  });
+
+  d3.selectAll('.incoming_arc').transition()
+  .duration(100)
+  .style('animation',function(d,i) {
+    var origin_state = globals.path.centroid(d3.select('#origin_tile_' + d.origin_state)._groups[0][0].__data__),
+        dest_state = globals.path.centroid(d3.select('#origin_tile_' + d.dest_state)._groups[0][0].__data__);
+
+    var west_of_source = (dest_state[0] - origin_state[0]) < 0;
+    var south_of_source = (dest_state[1] - origin_state[1]) > 0;
+
+    if (globals.double_svg_h > globals.double_svg_w && west_of_source || globals.double_svg_h < globals.double_svg_w && south_of_source) {
+      return 'flow ' + animation_rates[i] + 's linear infinite';
+    }
+    else {
+      return 'reverseflow ' + animation_rates[i] + 's linear infinite';
+    }
+  })
+  .style('-webkit-animation',function(d,i) {
+    var origin_state = globals.path.centroid(d3.select('#origin_tile_' + d.origin_state)._groups[0][0].__data__),
+        dest_state = globals.path.centroid(d3.select('#origin_tile_' + d.dest_state)._groups[0][0].__data__);
+
+    var west_of_source = (dest_state[0] - origin_state[0]) < 0;
+    var south_of_source = (dest_state[1] - origin_state[1]) > 0;
+
+    if (globals.double_svg_h > globals.double_svg_w && west_of_source || globals.double_svg_h < globals.double_svg_w && south_of_source) {
+      return 'flow ' + animation_rates[i] + 's linear infinite';
+    }
+    else {
+      return 'reverseflow ' + animation_rates[i] + 's linear infinite';
+    }
+  })
+  .attr('d', function(d) {
+    var origin_state = globals.path.centroid(d3.select('#origin_tile_' + d.origin_state)._groups[0][0].__data__),
+        dest_state = globals.path.centroid(d3.select('#origin_tile_' + d.dest_state)._groups[0][0].__data__);
+
+    var west_of_source = (dest_state[0] - origin_state[0]) < 0;
+    var south_of_source = (dest_state[1] - origin_state[1]) > 0;
+
+    dest_state[0] = globals.double_svg_h > globals.double_svg_w ? dest_state[0] : dest_state[0] + globals.svg_w;
+
+    dest_state[1] = globals.double_svg_h > globals.double_svg_w ? dest_state[1] + globals.svg_h : dest_state[1];
+            
+    var dx = dest_state[0] - origin_state[0],
+        dy = dest_state[1] - origin_state[1],
+        dr = Math.sqrt(dx * dx + dy * dy)*2;
+    if (globals.double_svg_h > globals.double_svg_w && west_of_source || globals.double_svg_h < globals.double_svg_w && south_of_source) {
+      return "M" + origin_state[0] + "," + origin_state[1] + "A" + dr + "," + dr + " 0 0,1 " + dest_state[0] + "," + dest_state[1];
+    }
+    return "M" + dest_state[0] + "," + dest_state[1] + "A" + dr + "," + dr + " 0 0,1 " + origin_state[0] + "," + origin_state[1];
   });
 
 }
