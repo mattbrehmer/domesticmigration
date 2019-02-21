@@ -77,7 +77,8 @@ paired_tilemap = function() {
         .attr('stroke', 'tomato')
         .style('animation',function(d,i) {
           var west_of_source = (d.dest[0] - d.origin[0]) < 0;
-          if (west_of_source) {
+          var south_of_source = (d.dest[1] - d.origin[1]) > 0;
+          if (west_of_source || south_of_source) {
             return 'reverseflow ' + animation_rates[i] + 's linear infinite';
           }
           else {
@@ -86,7 +87,8 @@ paired_tilemap = function() {
         })
         .style('-webkit-animation',function(d,i) {
           var west_of_source = (d.dest[0] - d.origin[0]) < 0;
-          if (west_of_source) {
+          var south_of_source = (d.dest[1] - d.origin[1]) > 0;
+          if (west_of_source || south_of_source) {
             return 'reverseflow ' + animation_rates[i] + 's linear infinite';
           }
           else {
@@ -98,7 +100,8 @@ paired_tilemap = function() {
 					    dy = d.dest[1] - d.origin[1],
               dr = Math.sqrt(dx * dx + dy * dy)*2;
           var west_of_source = (d.dest[0] - d.origin[0]) < 0;
-          if (west_of_source) {
+          var south_of_source = (d.dest[1] - d.origin[1]) > 0;
+          if (west_of_source || south_of_source) {
             return "M" + d.dest[0] + "," + d.dest[1] + "A" + dr + "," + dr + " 0 0,1 " + d.origin[0] + "," + d.origin[1];
           }
           return "M" + d.origin[0] + "," + d.origin[1] + "A" + dr + "," + dr + " 0 0,1 " + d.dest[0] + "," + d.dest[1];
@@ -218,7 +221,8 @@ paired_tilemap = function() {
         .attr('stroke', 'cornflowerblue')
         .style('animation',function(d,i) {
           var west_of_source = (d.dest[0] - d.origin[0]) < 0;
-          if (west_of_source) {
+          var south_of_source = (d.dest[1] - d.origin[1]) > 0;
+          if (west_of_source || south_of_source) {
             return 'flow ' + animation_rates[i] + 's linear infinite';
           }
           else {
@@ -227,7 +231,8 @@ paired_tilemap = function() {
         })
         .style('-webkit-animation',function(d,i) {
           var west_of_source = (d.dest[0] - d.origin[0]) < 0;
-          if (west_of_source) {
+          var south_of_source = (d.dest[1] - d.origin[1]) > 0;
+          if (west_of_source || south_of_source) {
             return 'flow ' + animation_rates[i] + 's linear infinite';
           }
           else {
@@ -239,7 +244,8 @@ paired_tilemap = function() {
 					    dy = d.dest[1] - d.origin[1],
               dr = Math.sqrt(dx * dx + dy * dy)*2;
           var west_of_source = (d.dest[0] - d.origin[0]) < 0;
-          if (west_of_source) {            
+          var south_of_source = (d.dest[1] - d.origin[1]) > 0;
+          if (globals.double_svg_h > globals.double_svg_w && west_of_source || globals.double_svg_h < globals.double_svg_w && south_of_source) {            
             return "M" + d.origin[0] + "," + d.origin[1] + "A" + dr + "," + dr + " 0 0,1 " + d.dest[0] + "," + d.dest[1];
           }
           return "M" + d.dest[0] + "," + d.dest[1] + "A" + dr + "," + dr + " 0 0,1 " + d.origin[0] + "," + d.origin[1];
