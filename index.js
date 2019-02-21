@@ -119,7 +119,8 @@ function render() {
         dy = dest_state[1] - origin_state[1],
         dr = Math.sqrt(dx * dx + dy * dy)*2;
     var west_of_source = (dest_state[0] - origin_state[0]) < 0;
-    if (west_of_source) {
+    var south_of_source = (dest_state[1] - origin_state[1]) > 0;
+    if (globals.double_svg_h > globals.double_svg_w && west_of_source || globals.double_svg_h < globals.double_svg_w && south_of_source) {
       return "M" + dest_state[0] + "," + dest_state[1] + "A" + dr + "," + dr + " 0 0,1 " + origin_state[0] + "," + origin_state[1];
     }
     return "M" + origin_state[0] + "," + origin_state[1] + "A" + dr + "," + dr + " 0 0,1 " + dest_state[0] + "," + dest_state[1];
