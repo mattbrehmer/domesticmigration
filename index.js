@@ -105,6 +105,26 @@ function render() {
   globals.tilemap_g_1.call(globals.tilemap_instance_1);
   globals.tilemap_g_2.call(globals.tilemap_instance_2);
 
+  d3.selectAll('.arc').transition()
+  .duration(100)
+  .attr('d', function(d) {
+    var origin_state = globals.path.centroid(d3.select('#origin_tile_' + d.origin_state)._groups[0][0].__data__),
+        dest_state = globals.path.centroid(d3.select('#origin_tile_' + d.dest_state)._groups[0][0].__data__);
+
+    dest_state[0] = globals.double_svg_h > globals.double_svg_w ? dest_state[0] : dest_state[0] + globals.svg_w;
+
+    dest_state[1] = globals.double_svg_h > globals.double_svg_w ? dest_state[1] + globals.svg_h : dest_state[1];
+            
+    var dx = dest_state[0] - origin_state[0],
+        dy = dest_state[1] - origin_state[1],
+        dr = Math.sqrt(dx * dx + dy * dy)*2;
+    var west_of_source = (dest_state[0] - origin_state[0]) < 0;
+    if (west_of_source) {
+      return "M" + dest_state[0] + "," + dest_state[1] + "A" + dr + "," + dr + " 0 0,1 " + origin_state[0] + "," + origin_state[1];
+    }
+    return "M" + origin_state[0] + "," + origin_state[1] + "A" + dr + "," + dr + " 0 0,1 " + dest_state[0] + "," + dest_state[1];
+  });
+
 }
 
 window.addEventListener('load', function() {
@@ -127,7 +147,7 @@ window.addEventListener('load', function() {
   loadTiles();
 });
 
-window.onresize = function(e) {
+window.onresize = function(e) {  
 
   var single_w = d3.select('.single').style('width').indexOf('p');
   globals.svg_w = +d3.select('.single').style('width').substr(0,single_w);
@@ -145,7 +165,7 @@ window.onresize = function(e) {
   var checkOrientation = setInterval(function() {
 
     globals.orientation_changed = false;
-    if (window.innerWidth < 506 & globals.double_svg_h == globals.svg_h) {
+    if (window.innerWidth < 506 && globals.double_svg_h <= globals.svg_h) {
       orientation_changed = false;
       globals.double_svg_h = (globals.svg_h * 2);    
       render();
@@ -157,6 +177,7 @@ window.onresize = function(e) {
     }
     else {
       orientation_changed = true;
+      render();
       clearInterval(checkOrientation);
     }
   }, 100);
