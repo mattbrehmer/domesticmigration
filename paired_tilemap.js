@@ -66,6 +66,8 @@ paired_tilemap = function() {
         var arc_enter = arc_links.selectAll('path')
         .data(arcdata)
         .enter();
+        
+        var animation_rates = _.sampleSize([1,2,3,4,5],5);
 
         arc_enter.append('path')
         .attr('class','arc')
@@ -73,6 +75,24 @@ paired_tilemap = function() {
           return 'arc_' + d.origin_state + '_' + d.dest_state;
         })
         .attr('stroke', 'tomato')
+        .style('animation',function(d,i) {
+          var west_of_source = (d.dest[0] - d.origin[0]) < 0;
+          if (west_of_source) {
+            return 'reverseflow ' + animation_rates[i] + 's linear infinite';
+          }
+          else {
+            return 'flow ' + animation_rates[i] + 's linear infinite';
+          }
+        })
+        .style('-webkit-animation',function(d,i) {
+          var west_of_source = (d.dest[0] - d.origin[0]) < 0;
+          if (west_of_source) {
+            return 'reverseflow ' + animation_rates[i] + 's linear infinite';
+          }
+          else {
+            return 'flow ' + animation_rates[i] + 's linear infinite';
+          }
+        })
         .attr('d', function(d) {
           var dx = d.dest[0] - d.origin[0],
 					    dy = d.dest[1] - d.origin[1],
@@ -184,6 +204,8 @@ paired_tilemap = function() {
         arc_links = this_paired_tilemap.append('g')
         .attr('class','arcs');
 
+        var animation_rates = _.sampleSize([1,2,3,4,5],5);
+
         var arc_enter = arc_links.selectAll('path')
         .data(arcdata)
         .enter();
@@ -194,15 +216,33 @@ paired_tilemap = function() {
           return 'arc_' + d.origin_state + '_' + d.dest_state;
         })
         .attr('stroke', 'cornflowerblue')
+        .style('animation',function(d,i) {
+          var west_of_source = (d.dest[0] - d.origin[0]) < 0;
+          if (west_of_source) {
+            return 'flow ' + animation_rates[i] + 's linear infinite';
+          }
+          else {
+            return 'reverseflow ' + animation_rates[i] + 's linear infinite';
+          }
+        })
+        .style('-webkit-animation',function(d,i) {
+          var west_of_source = (d.dest[0] - d.origin[0]) < 0;
+          if (west_of_source) {
+            return 'flow ' + animation_rates[i] + 's linear infinite';
+          }
+          else {
+            return 'reverseflow ' + animation_rates[i] + 's linear infinite';
+          }
+        })
         .attr('d', function(d) {
           var dx = d.dest[0] - d.origin[0],
 					    dy = d.dest[1] - d.origin[1],
               dr = Math.sqrt(dx * dx + dy * dy)*2;
           var west_of_source = (d.dest[0] - d.origin[0]) < 0;
-          if (west_of_source) {
-            return "M" + d.dest[0] + "," + d.dest[1] + "A" + dr + "," + dr + " 0 0,1 " + d.origin[0] + "," + d.origin[1];
+          if (west_of_source) {            
+            return "M" + d.origin[0] + "," + d.origin[1] + "A" + dr + "," + dr + " 0 0,1 " + d.dest[0] + "," + d.dest[1];
           }
-          return "M" + d.origin[0] + "," + d.origin[1] + "A" + dr + "," + dr + " 0 0,1 " + d.dest[0] + "," + d.dest[1];
+          return "M" + d.dest[0] + "," + d.dest[1] + "A" + dr + "," + dr + " 0 0,1 " + d.origin[0] + "," + d.origin[1];
         });
 
         d3.select('#dest_tile_' + globals.stateCodes[i]).select('path').attr('stroke', 'cornflowerblue');

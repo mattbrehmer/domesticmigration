@@ -37,7 +37,49 @@ body {
 }
 
 .arc {
-  stroke-width: 2px;
   pointer-events: none;
   fill: none;
+  opacity: 0.8;
+  stroke-width: 5px;
+  stroke-dasharray: 10, 4;
+}
+
+@keyframes flow {
+  from {
+    stroke-dashoffset: 14;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@-webkit-keyframes flow {
+  from {
+    stroke-dashoffset: 14;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes reverseflow {
+  from {
+    stroke-dashoffset: 0;
+  }
+
+  to {
+    stroke-dashoffset: 14;
+  }
+}
+
+@-webkit-keyframes reverseflow {
+  from {
+    stroke-dashoffset: 0;
+  }
+
+  to {
+    stroke-dashoffset: 14;
+  }
 }
