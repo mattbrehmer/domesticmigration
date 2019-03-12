@@ -25,7 +25,6 @@ var globals = {
   stateNames: undefined,
   scaling_factor: undefined,
   orientation_changed: undefined,
-  flowdata: undefined,
   outbound: undefined
   //colorValues: undefined
 };
@@ -239,7 +238,21 @@ window.addEventListener('load', function() {
   globals.stateNames = [];
   //globals.colorValues = [];
 
-  globals.flowdata = 
+  d3.tsv('data/graph.tsv',function(data) {
+    globals.outbound = d3.nest()
+      .key(function(d){
+        return d.Origin_State;
+      })
+      .sortKeys(d3.ascending)
+      .key(function(d){
+        return d.Dest_State;
+      })
+      .rollup(function(leaves){
+        return d3.sum(leaves, function(d) {return (d.AllQueries)});
+      })
+      .sortKeys(d3.ascending)      
+      .entries(data)
+  });
 
   loadTiles();
 });
