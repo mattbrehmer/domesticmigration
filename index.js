@@ -24,7 +24,9 @@ var globals = {
   stateCodes: undefined,
   stateNames: undefined,
   scaling_factor: undefined,
-  orientation_changed: undefined
+  orientation_changed: undefined,
+  flowdata: undefined,
+  outbound: undefined
   //colorValues: undefined
 };
 
@@ -88,6 +90,17 @@ function loadTiles() {
   globals.tilemap_instance_1 = tilemap();
   globals.tilemap_instance_2 = tilemap();
   
+}
+
+function nest(seq,keys) {
+  if (!keys.length) {
+    return seq;
+  }
+  var first = keys[0];
+  var rest = keys.slice(1);
+  return _.mapValues(_.groupBy(seq, first), function (value) { 
+    return nest(value, rest);
+  });
 }
 
 function render() {
@@ -225,6 +238,8 @@ window.addEventListener('load', function() {
   globals.stateCodes = [];
   globals.stateNames = [];
   //globals.colorValues = [];
+
+  globals.flowdata = 
 
   loadTiles();
 });
