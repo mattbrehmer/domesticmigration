@@ -25,15 +25,15 @@ paired_tilemap = function() {
       // .attr('fill', function (d, i) {
       //   return linear(colorValues[i]);
       // })
-      .attr('stroke', '#130C0E')
+      .attr('stroke', '#222222')
       .attr('stroke-width', globals.scaling_factor * 4)
       .on('click', function (d, i) {
         
         d3.event.preventDefault(); 
 
         d3.select('.arcs').remove();
-        d3.selectAll('.origin_tile').select('path').attr('stroke', '#130C0E');
-        d3.selectAll('.dest_tile').select('path').attr('stroke', '#130C0E');
+        d3.selectAll('.origin_tile').select('path').attr('stroke', '#222222');
+        d3.selectAll('.dest_tile').select('path').attr('stroke', '#222222');
         
         var arcdata = [];
         var links = _.sampleSize(globals.stateCodes,5);
@@ -139,7 +139,7 @@ paired_tilemap = function() {
       .attr('d', globals.path);
 
       origin_tiles_update.selectAll('text')
-      .style('font-size', globals.scaling_factor + 'em')
+      .style('font-size', (globals.scaling_factor * 1.25) + 'em')
       .attr('transform', function (d) {
         return 'translate(' + globals.path.centroid(d) + ')';
       });
@@ -169,15 +169,15 @@ paired_tilemap = function() {
       // .attr('fill', function (d, i) {
       //   return linear(colorValues[i]);
       // })
-      .attr('stroke', '#130C0E')
+      .attr('stroke', '#222222')
       .attr('stroke-width', globals.scaling_factor * 4)
       .on('click', function (d, i) {
         
         d3.event.preventDefault(); 
 
         d3.select('.arcs').remove();
-        d3.selectAll('.origin_tile').select('path').attr('stroke', '#130C0E');
-        d3.selectAll('.dest_tile').select('path').attr('stroke', '#130C0E');
+        d3.selectAll('.origin_tile').select('path').attr('stroke', '#222222');
+        d3.selectAll('.dest_tile').select('path').attr('stroke', '#222222');
         
         var arcdata = [];
         var links = _.sampleSize(globals.stateCodes,5);
@@ -286,7 +286,7 @@ paired_tilemap = function() {
       .attr('d', globals.path);
 
       dest_tiles_update.selectAll('text')
-      .style('font-size', globals.scaling_factor + 'em')
+      .style('font-size', (globals.scaling_factor * 1.25) + 'em')
       .attr('transform', function (d) {
         return 'translate(' + globals.path.centroid(d) + ')';
       });

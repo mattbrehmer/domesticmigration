@@ -4,11 +4,16 @@ body {
   font-family: 'Lato',"Apple SD Gothic Neo", "Segoe UI Web Regular","wf_segoe-ui_normal","Segoe UI","Segoe UI Symbol","Myriad","Calibri","UnDotum","Damascus","Futura","Helvetica Neue","BBAlpha Sans","S60 Sans","Arial",sans-serif;
   background-color: #222222;
   font-weight: 400;
-  color: #fff;
+  color: #222;
+}
+
+.legend_text {
+  fill: #fff;
+  font-size: 0.6em;
 }
 
 .state-label {
-  fill: #fff;
+  fill: #222;
   fill-opacity: .9;
   letter-spacing: 0.1em;
   font-size: 1em;

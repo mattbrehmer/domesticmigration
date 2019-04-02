@@ -25,7 +25,11 @@ var globals = {
   stateNames: undefined,
   scaling_factor: undefined,
   orientation_changed: undefined,
-  outbound: undefined
+  outbound: undefined,
+  outbound_counts: undefined,
+  inbound: undefined,
+  inbound_counts: undefined,
+  loadQuery: undefined
   //colorValues: undefined
 };
 
@@ -38,8 +42,85 @@ function scale (scaleFactor) {
     }
   });
 }
+
+function loadFlows(query) {
+  globals.outbound_counts = [];
+  globals.inbound_counts = [];
+  //globals.colorValues = [];
+
+  globals.stateCodesWithNames.forEach(function(state) {
+    globals.outbound_counts.push({
+      'state': state.state,
+      'code': state.code
+    });
+    globals.inbound_counts.push({
+      'state': state.state,
+      'code': state.code
+    });
+  });
+
+  d3.tsv('data/graph.tsv',function(outbound_data) {
+    globals.outbound = d3.nest()
+    .key(function(d){
+      return d.Origin_State;
+    })
+    .sortKeys(d3.ascending)
+    .key(function(d){
+      return d.Dest_State;
+    })
+    .rollup(function(leaves){
+      return d3.sum(leaves, function(d) {return (d[query]);});
+    })
+    .sortKeys(d3.ascending)    
+    .entries(outbound_data);
+
+    for(var i = 0; i < globals.outbound.length; i++) {
+      if (globals.outbound[i].key != "District of Columbia") {
+        var outbound_count = 0;
+        for (var j = 0; j < globals.outbound[i].values.length; j++){
+          if (globals.outbound[i].values[j].key != "District of Columbia") {
+            outbound_count += globals.outbound[i].values[j].value;
+          }
+        }
+        globals.outbound_counts[_.findIndex(globals.outbound_counts, { 'state': globals.outbound[i].key })].count = outbound_count;
+      }
+    }
+  });
+
+  d3.tsv('data/graph.tsv',function(inbound_data) {
+    globals.inbound = d3.nest()
+    .key(function(d){
+      return d.Dest_State;
+    })
+    .sortKeys(d3.ascending)
+    .key(function(d){
+      return d.Origin_State;
+    })
+    .rollup(function(leaves){
+      return d3.sum(leaves, function(d) {return (d[query]);});
+    })
+    .sortKeys(d3.ascending)    
+    .entries(inbound_data);
+
+    for(var i = 0; i < globals.inbound.length; i++) {
+      if (globals.inbound[i].key != "District of Columbia") {
+        var inbound_count = 0;
+        for (var j = 0; j < globals.inbound[i].values.length; j++){
+          if (globals.inbound[i].values[j].key != "District of Columbia") {
+            inbound_count += globals.inbound[i].values[j].value;
+          }
+        }
+        globals.inbound_counts[_.findIndex(globals.inbound_counts, { 'state': globals.inbound[i].key })].count = inbound_count;
+      }
+    }
+  });
+}
   
 function loadTiles() {
+
+  loadFlows("AllQueries");
+
+  d3.selectAll('svg').append('defs');
 
   globals.svg_0 = d3.select('#svg_0');
   globals.tilemap_g_0 = globals.svg_0.append('g')
@@ -75,7 +156,7 @@ function loadTiles() {
   });
 
   var checkExist = setInterval(function() {
-    if (globals.tiles != undefined) {        
+    if (globals.tiles != undefined && globals.outbound_counts != undefined && globals.inbound_counts != undefined) {        
       globals.tilemap_g_0.datum(globals.tiles);
       globals.tilemap_g_1.datum(globals.tiles);
       globals.tilemap_g_2.datum(globals.tiles);
@@ -103,7 +184,7 @@ function nest(seq,keys) {
 }
 
 function render() {
-
+  
   globals.svg_0.style('width',globals.double_svg_w + 'px')
                .style('height',globals.double_svg_h + 'px');
 
@@ -112,6 +193,10 @@ function render() {
 
   globals.svg_2.style('width',globals.svg_w + 'px')
                .style('height',globals.svg_h + 'px');
+
+  globals.tilemap_instance_1.params().state_values = globals.outbound_counts;             
+  globals.tilemap_instance_2.params().state_values = globals.inbound_counts;             
+  globals.tilemap_instance_2.params().flowtype = "inbound";
 
   globals.tilemap_g_0.call(globals.tilemap_instance_0);             
   globals.tilemap_g_1.call(globals.tilemap_instance_1);
@@ -236,24 +321,17 @@ window.addEventListener('load', function() {
   globals._ = window._;
   globals.stateCodes = [];
   globals.stateNames = [];
-  //globals.colorValues = [];
 
-  d3.tsv('data/graph.tsv',function(data) {
-    globals.outbound = d3.nest()
-      .key(function(d){
-        return d.Origin_State;
-      })
-      .sortKeys(d3.ascending)
-      .key(function(d){
-        return d.Dest_State;
-      })
-      .rollup(function(leaves){
-        return d3.sum(leaves, function(d) {return (d.AllQueries)});
-      })
-      .sortKeys(d3.ascending)      
-      .entries(data)
-  });
-
+  globals.loadQuery = function(query){
+    loadFlows(query);
+    var checkExist = setInterval(function() {
+      if (globals.outbound_counts != [] && globals.inbound_counts != []) {        
+        render();      
+        clearInterval(checkExist);
+      }
+    }, 100); // check every 100ms
+  };
+  
   loadTiles();
 });
 
