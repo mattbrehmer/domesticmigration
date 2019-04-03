@@ -1,21 +1,23 @@
 tilemap = function() {
-  var params = {};
-      params.state_values = [];
-      params.flowtype = "outbound";
+  var state_values = [],
+      flowtype = "outbound",
       color_scale = d3.scaleLinear();
 
   function tilemap (selection) {
     selection.each(function(data){
 
+      console.log(flowtype);
+      console.log(state_values);
+
       var color_scale_max = 1;
-      if (params.state_values.length != 0) {
-        color_scale_max = d3.max(params.state_values, function(d) { 
+      if (state_values.length != 0) {
+        color_scale_max = d3.max(state_values, function(d) { 
           return d.count; 
         });
       }
 
       color_scale.domain([0,(color_scale_max / 2),color_scale_max])
-      .range(params.flowtype == "outbound" ? [d3.lab("#fee0d2"),d3.lab("#fc9272"),d3.lab("#de2d26")] : [d3.lab("#deebf7"),d3.lab("#9ecae1"),d3.lab("#3182bd")])
+      .range(flowtype == "outbound" ? [d3.lab("#fee0d2"),d3.lab("#fc9272"),d3.lab("#de2d26")] : [d3.lab("#deebf7"),d3.lab("#9ecae1"),d3.lab("#3182bd")])
       .interpolate(d3.interpolateLab)
       .nice();
 
@@ -51,14 +53,14 @@ tilemap = function() {
       .attr('class','linear_gradient_start')
       .attr('offset', '0%')
       .attr('stop-color', function(){
-        return params.flowtype == "outbound" ? d3.lab("#fee0d2") : d3.lab("#deebf7");
+        return flowtype == "outbound" ? d3.lab("#fee0d2") : d3.lab("#deebf7");
       });
 
       linear_gradient_enter.append('stop')
       .attr('class','linear_gradient_end')
       .attr('offset', '100%')
       .attr('stop-color', function(d){
-        return params.flowtype == "outbound" ? d3.lab("#de2d26") : d3.lab("#3182bd");
+        return flowtype == "outbound" ? d3.lab("#de2d26") : d3.lab("#3182bd");
       });
 
       var linear_gradient_exit = linear_gradient.exit()
@@ -140,8 +142,8 @@ tilemap = function() {
       .attr('d', globals.path)
       .attr('class', 'border')
       .attr('fill', function (d, i) {
-        if (params.state_values.length != 0) {
-          return color_scale(_.find(params.state_values, { 'code': d.properties.state }).count);
+        if (state_values.length != 0) {
+          return color_scale(_.find(state_values, { 'code': d.properties.state }).count);
         }
         else {
           return color_scale(0);
@@ -175,8 +177,8 @@ tilemap = function() {
       tiles_update.selectAll('path')
       .attr('d', globals.path)
       .attr('fill', function (d, i) {
-        if (params.state_values.length != 0) {
-          return color_scale(_.find(params.state_values, { 'code': d.properties.state }).count);
+        if (state_values.length != 0) {
+          return color_scale(_.find(state_values, { 'code': d.properties.state }).count);
         }
         else {
           return color_scale(0);
@@ -195,11 +197,19 @@ tilemap = function() {
     });
   }
 
-  tilemap.params = function (x) {
+  tilemap.flowtype = function (x) {
     if (!arguments.length) {
-      return params;
+      return flowtype;
     }
-    params = x;
+    flowtype = x;
+    return tilemap;
+  };
+
+  tilemap.state_values = function (x) {
+    if (!arguments.length) {
+      return state_values;
+    }
+    state_values = x;
     return tilemap;
   };
 
