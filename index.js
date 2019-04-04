@@ -1,13 +1,11 @@
-var globals = {
+var gl = {
   svg_0: undefined,
   svg_1: undefined,
   svg_2: undefined,
   tilemap_g_0: undefined,
-  tilemap_instance_0: undefined,
   tilemap_g_1: undefined,
-  tilemap_instance_1: undefined,
   tilemap_g_2: undefined,
-  tilemap_instance_2: undefined,
+  tilemap_instances: undefined,
   svg_w: undefined,
   svg_h: undefined,
   double_svg_w: undefined,
@@ -26,12 +24,13 @@ var globals = {
   scaling_factor: undefined,
   orientation_changed: undefined,
   outbound: undefined,
-  outbound_counts: undefined,
+  flow_counts: undefined,
   inbound: undefined,
   inbound_counts: undefined,
   loadQuery: undefined,
   originQuery: undefined,
-  destQuery: undefined
+  destQuery: undefined,
+  migration_graph: undefined,
   //colorValues: undefined
 };
 
@@ -39,90 +38,48 @@ function scale (scaleFactor) {
   return d3.geoTransform({
     point: function(x, y) {
       this.stream.point(
-        0.975 * scaleFactor * (x - globals.tile_bbox[0]) + (0.0125 * globals.svg_w), 
-        0.975 * scaleFactor * ((globals.tile_bbox[3] - globals.tile_bbox[1]) + -1 * (y - globals.tile_bbox[1])) + (0.0125 * globals.svg_h));
+        0.975 * scaleFactor * (x - gl.tile_bbox[0]) + (0.0125 * gl.svg_w), 
+        0.975 * scaleFactor * ((gl.tile_bbox[3] - gl.tile_bbox[1]) + -1 * (y - gl.tile_bbox[1])) + (0.0125 * gl.svg_h));
     }
   });
 }
 
-function loadOutboundFlows(query) {
-  var outbound_flows = [];
+function loadFlows(query,flowtype) {
+  var flows = [];
 
-  globals.stateCodesWithNames.forEach(function(state) {
-    outbound_flows.push({
+  gl.stateCodesWithNames.forEach(function(state) {
+    flows.push({
       'state': state.state,
       'code': state.code
     });
   });
 
-  d3.tsv('data/graph.tsv',function(outbound_data) {
-    var outbound_array = d3.nest()
-    .key(function(d){
-      return d.Origin_State;
-    })
-    .sortKeys(d3.ascending)
-    .key(function(d){
-      return d.Dest_State;
-    })
-    .rollup(function(leaves){
-      return d3.sum(leaves, function(d) {return (d[query]);});
-    })
-    .sortKeys(d3.ascending)    
-    .entries(outbound_data);
+  var flow_array = d3.nest()
+  .key(function(d){
+    return (flowtype == 'outbound') ? d.Origin_State : d.Dest_State;
+  })
+  .sortKeys(d3.ascending)
+  .key(function(d){
+    return (flowtype == 'outbound') ? d.Dest_State : d.Origin_State;
+  })
+  .rollup(function(leaves){
+    return d3.sum(leaves, function(d) {return (d[query]);});
+  })
+  .sortKeys(d3.ascending)    
+  .entries(gl.migration_graph);
 
-    for(var i = 0; i < outbound_array.length; i++) {
-      if (outbound_array[i].key != "District of Columbia") {
-        var outbound_count = 0;
-        for (var j = 0; j < outbound_array[i].values.length; j++){
-          if (outbound_array[i].values[j].key != "District of Columbia") {
-            outbound_count += outbound_array[i].values[j].value;
-          }
+  for(var i = 0; i < flow_array.length; i++) {
+    if (flow_array[i].key != "District of Columbia") {
+      var flow_count = 0;
+      for (var j = 0; j < flow_array[i].values.length; j++){
+        if (flow_array[i].values[j].key != "District of Columbia") {
+          flow_count += flow_array[i].values[j].value;
         }
-        outbound_flows[_.findIndex(outbound_flows, { 'state': outbound_array[i].key })].count = outbound_count;
       }
+      flows[_.findIndex(flows, { 'state': flow_array[i].key })].count = flow_count;
     }
-  });
-  return outbound_flows;  
-}
-
-function loadInboundFlows(query) {
-  var inbound_flows = [];
-
-  globals.stateCodesWithNames.forEach(function(state) {    
-    inbound_flows.push({
-      'state': state.state,
-      'code': state.code
-    });
-  });
-
-  d3.tsv('data/graph.tsv',function(inbound_data) {
-    var inbound_array = d3.nest()
-    .key(function(d){
-      return d.Dest_State;
-    })
-    .sortKeys(d3.ascending)
-    .key(function(d){
-      return d.Origin_State;
-    })
-    .rollup(function(leaves){
-      return d3.sum(leaves, function(d) {return (d[query]);});
-    })
-    .sortKeys(d3.ascending)    
-    .entries(inbound_data);
-
-    for(var i = 0; i < inbound_array.length; i++) {
-      if (inbound_array[i].key != "District of Columbia") {
-        var inbound_count = 0;
-        for (var j = 0; j < inbound_array[i].values.length; j++){
-          if (inbound_array[i].values[j].key != "District of Columbia") {
-            inbound_count += inbound_array[i].values[j].value;
-          }
-        }
-        inbound_flows[_.findIndex(inbound_flows, { 'state': inbound_array[i].key })].count = inbound_count;
-      }
-    }
-  });
-  return inbound_flows;
+  }
+  return flows;  
 }
 
 function originFlows(origin,query) {
@@ -143,53 +100,53 @@ function loadTiles() {
 
   d3.selectAll('svg').append('defs');
 
-  globals.svg_0 = d3.select('#svg_0');
-  globals.tilemap_g_0 = globals.svg_0.append('g')
+  gl.svg_0 = d3.select('#svg_0');
+  gl.tilemap_g_0 = gl.svg_0.append('g')
   .attr('id','tilemap_g_0');
 
-  globals.svg_1 = d3.select('#svg_1');
-  globals.tilemap_g_1 = globals.svg_1.append('g')
+  gl.svg_1 = d3.select('#svg_1');
+  gl.tilemap_g_1 = gl.svg_1.append('g')
   .attr('id','tilemap_g_1');
 
-  globals.svg_2 = d3.select('#svg_2');
-  globals.tilemap_g_2 = globals.svg_2.append('g')
+  gl.svg_2 = d3.select('#svg_2');
+  gl.tilemap_g_2 = gl.svg_2.append('g')
   .attr('id','tilemap_g_2');
   
   d3.json('tiles-topo-us.json', function showData(error, tilegram) {
-    globals.tiles = topojson.feature(tilegram, tilegram.objects.tiles);
-    globals.tile_bbox = tilegram.bbox;
+    gl.tiles = topojson.feature(tilegram, tilegram.objects.tiles);
+    gl.tile_bbox = tilegram.bbox;
     
-    globals.scaling_factor = globals.svg_w / (globals.tile_bbox[2] - globals.tile_bbox[0]);
-    globals.svg_h = globals.scaling_factor * (globals.tile_bbox[3] - globals.tile_bbox[1]);
+    gl.scaling_factor = gl.svg_w / (gl.tile_bbox[2] - gl.tile_bbox[0]);
+    gl.svg_h = gl.scaling_factor * (gl.tile_bbox[3] - gl.tile_bbox[1]);
 
-    globals.double_svg_h = window.innerWidth < 506 ? (globals.svg_h * 2) : globals.svg_h;
+    gl.double_svg_h = window.innerWidth < 506 ? (gl.svg_h * 2) : gl.svg_h;
 
-    globals.path = d3.geoPath()
-    .projection(scale(globals.scaling_factor)); 
+    gl.path = d3.geoPath()
+    .projection(scale(gl.scaling_factor)); 
 
     tilegram.objects.tiles.geometries.forEach(function (geometry) {
-      if (globals.stateCodes.indexOf(geometry.properties.state) === -1) {
-        globals.stateCodes.push(geometry.properties.state);
-        globals.stateNames.push(_.find(stateCodesWithNames, { 'code': geometry.properties.state }).state);
-        // globals.colorValues.push(_.find(data, { 'code': geometry.properties.state }).value);
+      if (gl.stateCodes.indexOf(geometry.properties.state) === -1) {
+        gl.stateCodes.push(geometry.properties.state);
+        gl.stateNames.push(_.find(stateCodesWithNames, { 'code': geometry.properties.state }).state);
+        // gl.colorValues.push(_.find(data, { 'code': geometry.properties.state }).value);
       }
     });
   });
 
   var checkExist = setInterval(function() {
-    if (globals.tiles != undefined) {        
-      globals.tilemap_g_0.datum(globals.tiles);
-      globals.tilemap_g_1.datum(globals.tiles);
-      globals.tilemap_g_2.datum(globals.tiles);
+    if (gl.tiles != undefined) {        
+      gl.tilemap_g_0.datum(gl.tiles);
+      gl.tilemap_g_1.datum(gl.tiles);
+      gl.tilemap_g_2.datum(gl.tiles);
       render();    
 
       clearInterval(checkExist);
     }
   }, 100); // check every 100ms
 
-  globals.tilemap_instance_0 = paired_tilemap();
-  globals.tilemap_instance_1 = tilemap();
-  globals.tilemap_instance_2 = tilemap();
+  gl.tilemap_instances[0] = paired_tilemap();
+  gl.tilemap_instances[1] = tilemap();
+  gl.tilemap_instances[2] = tilemap();
   
 }
 
@@ -206,57 +163,59 @@ function nest(seq,keys) {
 
 function render() {
   
-  globals.svg_0.style('width',globals.double_svg_w + 'px')
-               .style('height',globals.double_svg_h + 'px');
+  gl.svg_0.style('width',gl.double_svg_w + 'px')
+               .style('height',gl.double_svg_h + 'px');
 
-  globals.svg_1.style('width',globals.svg_w + 'px')
-               .style('height',globals.svg_h + 'px');
+  gl.svg_1.style('width',gl.svg_w + 'px')
+               .style('height',gl.svg_h + 'px');
 
-  globals.svg_2.style('width',globals.svg_w + 'px')
-               .style('height',globals.svg_h + 'px');   
+  gl.svg_2.style('width',gl.svg_w + 'px')
+               .style('height',gl.svg_h + 'px');   
 
   var animation_rates = _.sampleSize([1,2,3,4,5],5);
 
   d3.selectAll('.outgoing_arc').transition()
   .duration(100)
-  .style('animation',function(d,i) {
-    var origin_state = globals.path.centroid(d3.select('#origin_tile_' + d.origin_state)._groups[0][0].__data__),
-        dest_state = globals.path.centroid(d3.select('#origin_tile_' + d.dest_state)._groups[0][0].__data__);
+  .style('animation',function(d) {
+    var animation_rate = this.id.substr(-1);
+    var origin_state = gl.path.centroid(d3.select('#origin_tile_' + d.origin_state)._groups[0][0].__data__),
+        dest_state = gl.path.centroid(d3.select('#origin_tile_' + d.dest_state)._groups[0][0].__data__);
 
     var west_of_source = (dest_state[0] - origin_state[0]) < 0;
     var south_of_source = (dest_state[1] - origin_state[1]) > 0;
     
     if (west_of_source || south_of_source) {
-      return 'reverseflow ' + animation_rates[i] + 's linear infinite';
+      return 'reverseflow ' + animation_rate + 's linear infinite';
     }
     else {
-      return 'flow ' + animation_rates[i] + 's linear infinite';
+      return 'flow ' + animation_rate + 's linear infinite';
     }
   })
-  .style('-webkit-animation',function(d,i) {
-    var origin_state = globals.path.centroid(d3.select('#origin_tile_' + d.origin_state)._groups[0][0].__data__),
-        dest_state = globals.path.centroid(d3.select('#origin_tile_' + d.dest_state)._groups[0][0].__data__);
+  .style('-webkit-animation',function(d) {
+    var animation_rate = this.id.substr(-1);
+    var origin_state = gl.path.centroid(d3.select('#origin_tile_' + d.origin_state)._groups[0][0].__data__),
+        dest_state = gl.path.centroid(d3.select('#origin_tile_' + d.dest_state)._groups[0][0].__data__);
 
     var west_of_source = (dest_state[0] - origin_state[0]) < 0;
     var south_of_source = (dest_state[1] - origin_state[1]) > 0;
 
     if (west_of_source || south_of_source) {
-      return 'reverseflow ' + animation_rates[i] + 's linear infinite';
+      return 'reverseflow ' + animation_rate + 's linear infinite';
     }
     else {
-      return 'flow ' + animation_rates[i] + 's linear infinite';
+      return 'flow ' + animation_rate + 's linear infinite';
     }
   })
   .attr('d', function(d) {
-    var origin_state = globals.path.centroid(d3.select('#origin_tile_' + d.origin_state)._groups[0][0].__data__),
-        dest_state = globals.path.centroid(d3.select('#origin_tile_' + d.dest_state)._groups[0][0].__data__);
+    var origin_state = gl.path.centroid(d3.select('#origin_tile_' + d.origin_state)._groups[0][0].__data__),
+        dest_state = gl.path.centroid(d3.select('#origin_tile_' + d.dest_state)._groups[0][0].__data__);
 
     var west_of_source = (dest_state[0] - origin_state[0]) < 0;
     var south_of_source = (dest_state[1] - origin_state[1]) > 0;
 
-    dest_state[0] = globals.double_svg_h > globals.double_svg_w ? dest_state[0] : dest_state[0] + globals.svg_w;
+    dest_state[0] = gl.double_svg_h > gl.double_svg_w ? dest_state[0] : dest_state[0] + gl.svg_w;
 
-    dest_state[1] = globals.double_svg_h > globals.double_svg_w ? dest_state[1] + globals.svg_h : dest_state[1];
+    dest_state[1] = gl.double_svg_h > gl.double_svg_w ? dest_state[1] + gl.svg_h : dest_state[1];
             
     var dx = dest_state[0] - origin_state[0],
         dy = dest_state[1] - origin_state[1],
@@ -269,114 +228,109 @@ function render() {
 
   d3.selectAll('.incoming_arc').transition()
   .duration(100)
-  .style('animation',function(d,i) {
-    var origin_state = globals.path.centroid(d3.select('#origin_tile_' + d.origin_state)._groups[0][0].__data__),
-        dest_state = globals.path.centroid(d3.select('#origin_tile_' + d.dest_state)._groups[0][0].__data__);
+  .style('animation',function(d) {
+    var animation_rate = this.id.substr(-1);
+    var origin_state = gl.path.centroid(d3.select('#origin_tile_' + d.origin_state)._groups[0][0].__data__),
+        dest_state = gl.path.centroid(d3.select('#origin_tile_' + d.dest_state)._groups[0][0].__data__);
 
     var west_of_source = (dest_state[0] - origin_state[0]) < 0;
     var south_of_source = (dest_state[1] - origin_state[1]) > 0;
 
-    if (globals.double_svg_h > globals.double_svg_w && west_of_source || globals.double_svg_h < globals.double_svg_w && south_of_source) {
-      return 'flow ' + animation_rates[i] + 's linear infinite';
+    if (gl.double_svg_h > gl.double_svg_w && west_of_source || gl.double_svg_h < gl.double_svg_w && south_of_source) {
+      return 'flow ' + animation_rate + 's linear infinite';
     }
     else {
-      return 'reverseflow ' + animation_rates[i] + 's linear infinite';
+      return 'reverseflow ' + animation_rate + 's linear infinite';
     }
   })
-  .style('-webkit-animation',function(d,i) {
-    var origin_state = globals.path.centroid(d3.select('#origin_tile_' + d.origin_state)._groups[0][0].__data__),
-        dest_state = globals.path.centroid(d3.select('#origin_tile_' + d.dest_state)._groups[0][0].__data__);
+  .style('-webkit-animation',function(d) {
+    var animation_rate = this.id.substr(-1);
+    var origin_state = gl.path.centroid(d3.select('#origin_tile_' + d.origin_state)._groups[0][0].__data__),
+        dest_state = gl.path.centroid(d3.select('#origin_tile_' + d.dest_state)._groups[0][0].__data__);
 
     var west_of_source = (dest_state[0] - origin_state[0]) < 0;
     var south_of_source = (dest_state[1] - origin_state[1]) > 0;
 
-    if (globals.double_svg_h > globals.double_svg_w && west_of_source || globals.double_svg_h < globals.double_svg_w && south_of_source) {
-      return 'flow ' + animation_rates[i] + 's linear infinite';
+    if (gl.double_svg_h > gl.double_svg_w && west_of_source || gl.double_svg_h < gl.double_svg_w && south_of_source) {
+      return 'flow ' + animation_rate + 's linear infinite';
     }
     else {
-      return 'reverseflow ' + animation_rates[i] + 's linear infinite';
+      return 'reverseflow ' + animation_rate + 's linear infinite';
     }
   })
   .attr('d', function(d) {
-    var origin_state = globals.path.centroid(d3.select('#origin_tile_' + d.origin_state)._groups[0][0].__data__),
-        dest_state = globals.path.centroid(d3.select('#origin_tile_' + d.dest_state)._groups[0][0].__data__);
+    var origin_state = gl.path.centroid(d3.select('#origin_tile_' + d.origin_state)._groups[0][0].__data__),
+        dest_state = gl.path.centroid(d3.select('#origin_tile_' + d.dest_state)._groups[0][0].__data__);
 
     var west_of_source = (dest_state[0] - origin_state[0]) < 0;
     var south_of_source = (dest_state[1] - origin_state[1]) > 0;
 
-    dest_state[0] = globals.double_svg_h > globals.double_svg_w ? dest_state[0] : dest_state[0] + globals.svg_w;
+    dest_state[0] = gl.double_svg_h > gl.double_svg_w ? dest_state[0] : dest_state[0] + gl.svg_w;
 
-    dest_state[1] = globals.double_svg_h > globals.double_svg_w ? dest_state[1] + globals.svg_h : dest_state[1];
+    dest_state[1] = gl.double_svg_h > gl.double_svg_w ? dest_state[1] + gl.svg_h : dest_state[1];
             
     var dx = dest_state[0] - origin_state[0],
         dy = dest_state[1] - origin_state[1],
         dr = Math.sqrt(dx * dx + dy * dy)*2;
-    if (globals.double_svg_h > globals.double_svg_w && west_of_source || globals.double_svg_h < globals.double_svg_w && south_of_source) {
+    if (gl.double_svg_h > gl.double_svg_w && west_of_source || gl.double_svg_h < gl.double_svg_w && south_of_source) {
       return "M" + origin_state[0] + "," + origin_state[1] + "A" + dr + "," + dr + " 0 0,1 " + dest_state[0] + "," + dest_state[1];
     }
     return "M" + dest_state[0] + "," + dest_state[1] + "A" + dr + "," + dr + " 0 0,1 " + origin_state[0] + "," + origin_state[1];
   });
 
-  globals.tilemap_g_0.call(globals.tilemap_instance_0);             
-  globals.tilemap_g_1.call(globals.tilemap_instance_1);
-  globals.tilemap_g_2.call(globals.tilemap_instance_2);
+  gl.tilemap_g_0.call(gl.tilemap_instances[0]);             
+  gl.tilemap_g_1.call(gl.tilemap_instances[1]);
+  gl.tilemap_g_2.call(gl.tilemap_instances[2]);
 
 }
 
 window.addEventListener('load', function() {
   var single_w = d3.select('.single').style('width').indexOf('p');
-  globals.svg_w = +d3.select('.single').style('width').substr(0,single_w);
+  gl.svg_w = +d3.select('.single').style('width').substr(0,single_w);
 
   var double_w = d3.select('.double').style('width').indexOf('p');
-  globals.double_svg_w = +d3.select('.double').style('width').substr(0,double_w);
+  gl.double_svg_w = +d3.select('.double').style('width').substr(0,double_w);
  
-  globals.stateCodesWithNames = window.stateCodesWithNames;
-  globals.topojson = window.topojson;
-  globals.d3 = window.d3;
-  globals.tilemap = window.tilemap;
-  globals.paired_tilemap = window.paired_tilemap;
-  globals._ = window._;
-  globals.stateCodes = [];
-  globals.stateNames = [];
+  gl.stateCodesWithNames = window.stateCodesWithNames;
+  gl.topojson = window.topojson;
+  gl.d3 = window.d3;
+  gl.tilemap = window.tilemap;
+  gl.paired_tilemap = window.paired_tilemap;
+  gl._ = window._;
+  gl.stateCodes = [];
+  gl.stateNames = [];
+  gl.tilemap_instances = [];
 
-  globals.loadQuery = function(query){    
+  d3.tsv('data/graph.tsv',function(error,data) {
+    if (error) throw (error);
 
-    var outbound_results = loadOutboundFlows(query);
-    var inbound_results = loadInboundFlows(query);
+    gl.migration_graph = data;
     
-    globals.tilemap_instance_1.state_values(outbound_results);
-    globals.tilemap_instance_2.flowtype("inbound");
-    globals.tilemap_instance_2.state_values(inbound_results);
-    
-    var checkOutboundExist = setInterval(function() {
-      if (globals.tilemap_instance_1.state_values() != []) {
-        globals.tilemap_g_1.call(globals.tilemap_instance_1);
-        clearInterval(checkOutboundExist);
-      }      
-    }, 100); // check every 100ms
+  });  
 
-    var checkInboundExist = setInterval(function() {
-      if (globals.tilemap_instance_2.state_values() != []) {
-        globals.tilemap_g_2.call(globals.tilemap_instance_2); 
-        clearInterval(checkInboundExist);
-      }      
-    }, 100); // check every 100ms
+  gl.loadQuery = function(tilemap,query,flowtype){      
+    
+    gl.tilemap_instances[tilemap].results(loadFlows(query,flowtype));
+    gl.tilemap_instances[tilemap].flowtype(flowtype);
+
+    render();    
+   
   };
 
-  globals.originQuery = function(origin,query){
+  gl.originQuery = function(origin,query){
     originFlows(origin,query);
     var checkExist = setInterval(function() {
-      if (globals.dest_counts != []) {        
+      if (gl.dest_counts != []) {        
         render();      
         clearInterval(checkExist);
       }
     }, 100);
   };
 
-   globals.destQuery = function(dest,query){
+   gl.destQuery = function(dest,query){
     destFlows(dest,query);
     var checkExist = setInterval(function() {
-      if (globals.origin_counts != []) {        
+      if (gl.origin_counts != []) {        
         render();      
         clearInterval(checkExist);
       }
@@ -384,34 +338,41 @@ window.addEventListener('load', function() {
   };
   
   loadTiles();
+
+  setTimeout(function(){
+    // Hide the address bar!
+    gl.loadQuery("1","AllQueries","outbound");
+    gl.loadQuery("2","AllQueries","inbound");
+  }, 500);   
+
 });
 
 window.onresize = function(e) {  
 
   var single_w = d3.select('.single').style('width').indexOf('p');
-  globals.svg_w = +d3.select('.single').style('width').substr(0,single_w);
+  gl.svg_w = +d3.select('.single').style('width').substr(0,single_w);
 
   var double_w = d3.select('.double').style('width').indexOf('p');
-  globals.double_svg_w = +d3.select('.double').style('width').substr(0,double_w);
+  gl.double_svg_w = +d3.select('.double').style('width').substr(0,double_w);
 
-  globals.scaling_factor = globals.svg_w / (globals.tile_bbox[2] - globals.tile_bbox[0]);
-  globals.svg_h = globals.scaling_factor * (globals.tile_bbox[3] - globals.tile_bbox[1]);
+  gl.scaling_factor = gl.svg_w / (gl.tile_bbox[2] - gl.tile_bbox[0]);
+  gl.svg_h = gl.scaling_factor * (gl.tile_bbox[3] - gl.tile_bbox[1]);
 
-  globals.path = d3.geoPath()
-  .projection(scale(globals.scaling_factor)); 
+  gl.path = d3.geoPath()
+  .projection(scale(gl.scaling_factor)); 
 
   
   var checkOrientation = setInterval(function() {
 
-    globals.orientation_changed = false;
-    if (window.innerWidth < 506 && globals.double_svg_h <= globals.svg_h) {
+    gl.orientation_changed = false;
+    if (window.innerWidth < 506 && gl.double_svg_h <= gl.svg_h) {
       orientation_changed = false;
-      globals.double_svg_h = (globals.svg_h * 2);    
+      gl.double_svg_h = (gl.svg_h * 2);    
       render();
     }
-    else if (window.innerWidth >= 506 && globals.double_svg_h != globals.svg_h) {
+    else if (window.innerWidth >= 506 && gl.double_svg_h != gl.svg_h) {
       orientation_changed = false;
-      globals.double_svg_h = globals.svg_h; 
+      gl.double_svg_h = gl.svg_h; 
       render(); 
     }
     else {

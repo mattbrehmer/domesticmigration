@@ -1,28 +1,24 @@
 tilemap = function() {
-  var state_values = [],
-      flowtype = "outbound",
+  var params = {},
+      results = [],
+      flowtype = 'outbound',
+      color_scale_max = 1,
       color_scale = d3.scaleLinear();
 
   function tilemap (selection) {
     selection.each(function(data){
 
-      console.log(flowtype);
-      console.log(state_values);
+      var legend = d3.select(this).selectAll('.legend')
+      .data([null]);
 
-      var color_scale_max = 1;
-      if (state_values.length != 0) {
-        color_scale_max = d3.max(state_values, function(d) { 
-          return d.count; 
-        });
-      }
+      color_scale_max = (results.length == 0) ? 1 : d3.max(results, function(d) { 
+        return d.count;
+      });
 
       color_scale.domain([0,(color_scale_max / 2),color_scale_max])
       .range(flowtype == "outbound" ? [d3.lab("#fee0d2"),d3.lab("#fc9272"),d3.lab("#de2d26")] : [d3.lab("#deebf7"),d3.lab("#9ecae1"),d3.lab("#3182bd")])
       .interpolate(d3.interpolateLab)
       .nice();
-
-      var legend = d3.select(this).selectAll('.legend')
-      .data([null]);
 
       var parent_svg = d3.select(this)._groups[0][0].parentElement;
       
@@ -52,19 +48,28 @@ tilemap = function() {
       linear_gradient_enter.append('stop')
       .attr('class','linear_gradient_start')
       .attr('offset', '0%')
-      .attr('stop-color', function(){
-        return flowtype == "outbound" ? d3.lab("#fee0d2") : d3.lab("#deebf7");
-      });
+      .attr('stop-color',  d3.lab('#fee0d2'));
+
+      linear_gradient_enter.append('stop')
+      .attr('class','linear_gradient_mid')
+      .attr('offset', '50%')
+      .attr('stop-color', (results.length == 0) ?  d3.lab('#fee0d2') : (flowtype == "outbound") ? d3.lab("#fc9272") : d3.lab("#9ecae1"));
 
       linear_gradient_enter.append('stop')
       .attr('class','linear_gradient_end')
       .attr('offset', '100%')
-      .attr('stop-color', function(d){
-        return flowtype == "outbound" ? d3.lab("#de2d26") : d3.lab("#3182bd");
-      });
+      .attr('stop-color', (results.length == 0) ?  d3.lab('#fee0d2') : (flowtype == "outbound") ? d3.lab("#de2d26") : d3.lab("#3182bd"));
 
-      var linear_gradient_exit = linear_gradient.exit()
-      .remove(); 
+      var linear_gradient_update = linear_gradient;
+
+      linear_gradient_update.select('.linear_gradient_start')
+      .attr('stop-color', (results.length == 0) ?  d3.lab('#fee0d2') : (flowtype == "outbound") ? d3.lab("#fee0d2") : d3.lab("#deebf7"));
+
+      linear_gradient_update.select('.linear_gradient_mid')
+      .attr('stop-color', (results.length == 0) ?  d3.lab('#fee0d2') : (flowtype == "outbound") ? d3.lab("#fc9272") : d3.lab("#9ecae1"));
+
+      linear_gradient_update.select('.linear_gradient_end')
+      .attr('stop-color', (results.length == 0) ?  d3.lab('#fee0d2') : (flowtype == "outbound") ? d3.lab("#de2d26") : d3.lab("#3182bd"));
 
       legend_enter.append('rect')
       .attr('id', parent_svg.id + '_legend_swatch')
@@ -89,7 +94,7 @@ tilemap = function() {
       legend_enter.append('text')
       .attr('class','legend_text')
       .attr('id','legend_text_end')
-      .text(color_scale.domain()[2])
+      .text((results.length == 0) ? 1 : color_scale.domain()[2])
       .attr('text-anchor', "end")
       .attr('dy','-0.2em')
       .attr('transform', function(){
@@ -115,18 +120,13 @@ tilemap = function() {
       });
 
       legend_update.select('#legend_text_end')
-      .text(color_scale.domain()[2])
+      .text((results.length == 0) ? 1 : color_scale.domain()[2])
       .attr('transform', function(){
         var w = parent_svg.style.width.indexOf('p');
         return 'translate(' + (+parent_svg.style.width.substr(0,w) / 3) + ',0)';
       });
       
-      var legend_exit = legend.exit()
-      .remove(); 
-
-      this_tilemap = d3.select(this);
-
-      var tiles = this_tilemap.selectAll(".tile")
+      var tiles = d3.select(this).selectAll(".tile")
       .data(data.features, function(d) {
         return d.properties.state;
       }); 
@@ -139,23 +139,16 @@ tilemap = function() {
       });
 
       tiles_enter.append('path')
-      .attr('d', globals.path)
+      .attr('d', gl.path)
       .attr('class', 'border')
-      .attr('fill', function (d, i) {
-        if (state_values.length != 0) {
-          return color_scale(_.find(state_values, { 'code': d.properties.state }).count);
-        }
-        else {
-          return color_scale(0);
-        }
-      })
+      .attr('fill', '#fee0d2')
       .attr('stroke', '#222222')
-      .attr('stroke-width', globals.scaling_factor * 4)
+      .attr('stroke-width', gl.scaling_factor * 4)
       .on('touchstart', function (d, i) {
         d3.event.preventDefault(); 
         console.log(d);
-        console.log('stateCodes[i]', globals.stateCodes[i]);
-        console.log('stateNames[i]', globals.stateNames[i]);
+        console.log('stateCodes[i]', gl.stateCodes[i]);
+        console.log('stateNames[i]', gl.stateNames[i]);
       });
 
       tiles_enter.append('text')
@@ -163,10 +156,10 @@ tilemap = function() {
         return 'state-label state-label-' + d.id;
       })
       .attr('transform', function (d) {
-        return 'translate(' + globals.path.centroid(d) + ')';
+        return 'translate(' + gl.path.centroid(d) + ')';
       })
       .attr('dy', '.35em')
-      .style('font-size', (globals.scaling_factor * 1.25) + 'em')
+      .style('font-size', (gl.scaling_factor * 1.25) + 'em')
       .text(function (d) {
         return d.properties.state;
       });
@@ -175,10 +168,10 @@ tilemap = function() {
       .duration(100);
 
       tiles_update.selectAll('path')
-      .attr('d', globals.path)
-      .attr('fill', function (d, i) {
-        if (state_values.length != 0) {
-          return color_scale(_.find(state_values, { 'code': d.properties.state }).count);
+      .attr('d', gl.path)
+      .attr('fill', function (d) {
+        if (results.length != 0) {
+          return color_scale(_.find(results, { 'code': d.properties.state }).count);
         }
         else {
           return color_scale(0);
@@ -186,16 +179,29 @@ tilemap = function() {
       });
 
       tiles_update.selectAll('text')
-      .style('font-size', (globals.scaling_factor * 1.25) + 'em')
+      .style('font-size', (gl.scaling_factor * 1.25) + 'em')
       .attr('transform', function (d) {
-        return 'translate(' + globals.path.centroid(d) + ')';
+        return 'translate(' + gl.path.centroid(d) + ')';
       });
-
-      tiles.exit()
-      .remove();
 
     });
   }
+
+  tilemap.params = function (x) {
+    if (!arguments.length) {
+      return params;
+    }
+    params = x;
+    return tilemap;
+  };
+
+  tilemap.results = function (x) {
+    if (!arguments.length) {
+      return results;
+    }
+    results = x;
+    return tilemap;
+  };
 
   tilemap.flowtype = function (x) {
     if (!arguments.length) {
@@ -205,22 +211,6 @@ tilemap = function() {
     return tilemap;
   };
 
-  tilemap.state_values = function (x) {
-    if (!arguments.length) {
-      return state_values;
-    }
-    state_values = x;
-    return tilemap;
-  };
-
-  tilemap.color_scale = function (x) {
-    if (!arguments.length) {
-      return color_scale;
-    }
-    color_scale = x;
-    return tilemap;
-  };
-  
   return tilemap;
 
 };
