@@ -699,6 +699,8 @@ paired_tilemap = function() {
     return paired_tilemap;
   };
 
+  //usage example: gl.tilemap_instances[0].query("JobQuery")
+
   paired_tilemap.query = function (x) {
     if (!arguments.length) {
       return query;
