@@ -1,4 +1,6 @@
 tilemap = function() {
+
+  //paremeterizable tilemap properties (getter/setter functions follow)
   var params = {},
       results = [],
       flowtype = 'outbound',
@@ -8,19 +10,22 @@ tilemap = function() {
   function tilemap (selection) {
     selection.each(function(data){
 
-      var legend = d3.select(this).selectAll('.legend')
-      .data([null]);
-
+      //determine the new maximum value among the query results
       color_scale_max = (results.length == 0) ? 1 : d3.max(results, function(d) { 
         return d.count;
       });
 
+      //update the color scale
       color_scale.domain([0,(color_scale_max / 2),color_scale_max])
       .range(flowtype == "outbound" ? [d3.lab("#fee0d2"),d3.lab("#fc9272"),d3.lab("#de2d26")] : [d3.lab("#deebf7"),d3.lab("#9ecae1"),d3.lab("#3182bd")])
       .interpolate(d3.interpolateLab)
       .nice();
-
+      
       var parent_svg = d3.select(this)._groups[0][0].parentElement;
+      
+      //enter the legend 
+      var legend = d3.select(this).selectAll('.legend')
+      .data([null]);
       
       var legend_enter = legend.enter()
       .append("g")
@@ -31,6 +36,7 @@ tilemap = function() {
         return 'translate(' + (+parent_svg.style.width.substr(0,w) / 3) + ',' + (+parent_svg.style.height.substr(0,h) / 16) + ')';
       });
 
+      //enter the legend gradient
       var defs = d3.select("#" + parent_svg.id).select('defs');
 
       var linear_gradient = defs.selectAll('.linear_gradient')
@@ -102,6 +108,7 @@ tilemap = function() {
         return 'translate(' + (+parent_svg.style.width.substr(0,w) / 3) + ',0)';
       });
 
+      //update the legend
       var legend_update = d3.select(this).selectAll('.legend')
       .attr('transform', function(){
         var w = parent_svg.style.width.indexOf('p');
@@ -126,6 +133,7 @@ tilemap = function() {
         return 'translate(' + (+parent_svg.style.width.substr(0,w) / 3) + ',0)';
       });
       
+      //enter the tiles
       var tiles = d3.select(this).selectAll(".tile")
       .data(data.features, function(d) {
         return d.properties.state;
@@ -164,6 +172,7 @@ tilemap = function() {
         return d.properties.state;
       });
 
+      //update the tiles
       var tiles_update = tiles.transition()
       .duration(100);
 
@@ -186,6 +195,8 @@ tilemap = function() {
 
     });
   }
+
+  //getter / setter functions for tilemap properties
 
   tilemap.params = function (x) {
     if (!arguments.length) {

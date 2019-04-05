@@ -1,4 +1,6 @@
 paired_tilemap = function() {
+
+  //paremeterizable properties for a paired tilemap (getter/setter functions follow)
   var params = {},
       query = "AllQueries",
       origin_color_scale_max = 1,
@@ -14,6 +16,8 @@ paired_tilemap = function() {
       var parent_svg = d3.select(this)._groups[0][0].parentElement;
 
       var defs = d3.select("#" + parent_svg.id).select('defs');
+
+      //enter the origin legend
 
       var origin_legend = d3.select(this).selectAll('.origin_legend')
       .data([null]);
@@ -36,6 +40,8 @@ paired_tilemap = function() {
         var swatch_h = (wt >= ht) ? 16 : 32;
         return 'translate(' + (wt / h_shift) + ',' + (ht / swatch_h) + ')';
       });
+
+      //enter the gradient for the origin legend
 
       var origin_linear_gradient = defs.selectAll('.origin_linear_gradient')
       .data([null]);
@@ -107,6 +113,8 @@ paired_tilemap = function() {
         return 'translate(' + (wt / h_shift) + ',0)';
       });
 
+      //update the origin legend
+
       var origin_legend_update = d3.select(this).selectAll('.origin_legend')
       .attr('transform', function(){
         var w = parent_svg.style.width.indexOf('p');
@@ -148,6 +156,8 @@ paired_tilemap = function() {
         return 'translate(' + (wt / h_shift) + ',0)';
       });
 
+      //enter the origin tiles
+
       var origin_tiles = this_paired_tilemap.selectAll(".origin_tile")
       .data(data.features, function(d) {
         return d.properties.state;
@@ -170,6 +180,8 @@ paired_tilemap = function() {
       .attr('stroke', '#222222')
       .attr('stroke-width', gl.scaling_factor * 4)
       .on('click', function (d, i) {
+
+        //trigger outbound flows from selected origin tile to dest tiles
 
         d3.event.preventDefault(); 
 
@@ -238,14 +250,6 @@ paired_tilemap = function() {
           }
         }
 
-        // console.log({
-        //   'd': d,
-        //   'stateCodes[i]': gl.stateCodes[i],
-        //   'stateNames[i]': gl.stateNames[i],
-        //   'centroid(d)': gl.path.centroid(d),
-        //   'arcdata': arcdata
-        // });
-
         arc_links = this_paired_tilemap.append('g')
         .attr('class','arcs');
 
@@ -310,6 +314,8 @@ paired_tilemap = function() {
 
       });      
 
+      // origin tile labels
+
       origin_tiles_enter.append('text')
       .attr('class', function (d) {
         return 'state-label state-label-' + d.id;
@@ -338,10 +344,14 @@ paired_tilemap = function() {
       origin_tiles.exit()
       .remove();
 
+      //dest color scale
+
       dest_color_scale.domain([0,(dest_color_scale_max / 2),dest_color_scale_max])
       .range([d3.lab("#deebf7"),d3.lab("#9ecae1"),d3.lab("#3182bd")])
       .interpolate(d3.interpolateLab)
       .nice();
+
+      //dest legend enter
 
       var dest_legend = d3.select(this).selectAll('.dest_legend')
       .data([null]);
@@ -430,6 +440,8 @@ paired_tilemap = function() {
         return 'translate(' + (wt / h_shift) + ',0)';
       });
 
+      //dest legend update
+
       var dest_legend_update = d3.select(this).selectAll('.dest_legend')
       .attr('transform', function(){
         var w = parent_svg.style.width.indexOf('p');
@@ -471,6 +483,8 @@ paired_tilemap = function() {
         return 'translate(' + (wt / h_shift) + ',0)';
       });
 
+      //dest tiles enter
+
       var dest_tiles = this_paired_tilemap.selectAll(".dest_tile")
       .data(data.features, function(d) {
         return d.properties.state;
@@ -496,6 +510,8 @@ paired_tilemap = function() {
       .attr('stroke', '#222222')
       .attr('stroke-width', gl.scaling_factor * 4)
       .on('click', function (d, i) {
+
+        // trigger incoming flows to selected dest tile from origin tiles
         
         d3.event.preventDefault();         
 
@@ -563,14 +579,6 @@ paired_tilemap = function() {
           }
         }
 
-        // console.log({
-        //   'd': d,
-        //   'stateCodes[i]': gl.stateCodes[i],
-        //   'stateNames[i]': gl.stateNames[i],
-        //   'centroid(d)': gl.path.centroid(d),
-        //   'arcdata': arcdata
-        // });
-
         arc_links = this_paired_tilemap.append('g')
         .attr('class','arcs');
 
@@ -635,6 +643,8 @@ paired_tilemap = function() {
 
       });  
 
+      //text labels for dest tiles
+
       dest_tiles_enter.append('text')
       .attr('class', function (d) {
         return 'state-label state-label-' + d.id;
@@ -647,6 +657,8 @@ paired_tilemap = function() {
       .text(function (d) {
         return d.properties.state;
       });
+
+      // update the dest tiles
 
       var dest_tiles_update = dest_tiles.transition()
       .duration(100)
@@ -666,6 +678,8 @@ paired_tilemap = function() {
       dest_tiles.exit()
       .remove();
 
+      //move SVG element to front helper function
+
       d3.selection.prototype.moveToFront = function() {  
         return this.each(function(){
           this.parentNode.appendChild(this);
@@ -674,6 +688,8 @@ paired_tilemap = function() {
 
     });
   }
+
+  //getter / setter functions for paired tilemap properties
 
   paired_tilemap.params = function (x) {
     if (!arguments.length) {

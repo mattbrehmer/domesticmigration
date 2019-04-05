@@ -1,3 +1,6 @@
+/** 
+ * GLOBAL VARIABLES
+*/
 var gl = {
   svg_0: undefined,
   svg_1: undefined,
@@ -23,16 +26,11 @@ var gl = {
   stateNames: undefined,
   scaling_factor: undefined,
   orientation_changed: undefined,
-  outbound: undefined,
-  flow_counts: undefined,
-  inbound: undefined,
-  inbound_counts: undefined,
   loadQuery: undefined,
-  originQuery: undefined,
-  destQuery: undefined,
-  migration_graph: undefined,
-  //colorValues: undefined
+  migration_graph: undefined
 };
+
+//utility function for scaling the TopoJSON
 
 function scale (scaleFactor) {
   return d3.geoTransform({
@@ -44,6 +42,7 @@ function scale (scaleFactor) {
   });
 }
 
+//returns a doubly nested array specified by a query field (e.g., "AllQueries", "JobQuery", etc.) and a flowtype ("inbound" | "outbound") 
 function loadFlows(query,flowtype) {
   var flows = [];
 
@@ -54,6 +53,7 @@ function loadFlows(query,flowtype) {
     });
   });
 
+  //converts tabular migration graph into a hierarchical array according to flow direction, with a single query value at each leaf
   var flow_array = d3.nest()
   .key(function(d){
     return (flowtype == 'outbound') ? d.Origin_State : d.Dest_State;
@@ -68,6 +68,7 @@ function loadFlows(query,flowtype) {
   .sortKeys(d3.ascending)    
   .entries(gl.migration_graph);
 
+  //computes aggregate number of flows for each state
   for(var i = 0; i < flow_array.length; i++) {
     if (flow_array[i].key != "District of Columbia") {
       var flow_count = 0;
@@ -82,24 +83,12 @@ function loadFlows(query,flowtype) {
   return flows;  
 }
 
-function originFlows(origin,query) {
-  console.log({
-    'origin': origin,
-    'query': query
-  });
-}
-
-function destFlows(dest,query) {
-  console.log({
-    'dest': dest,
-    'query': query
-  });
-}
-  
+//loads the TopoJSON structure shared by all tilemaps
 function loadTiles() {
 
   d3.selectAll('svg').append('defs');
 
+  //add containers for each tilemap 
   gl.svg_0 = d3.select('#svg_0');
   gl.tilemap_g_0 = gl.svg_0.append('g')
   .attr('id','tilemap_g_0');
@@ -111,8 +100,14 @@ function loadTiles() {
   gl.svg_2 = d3.select('#svg_2');
   gl.tilemap_g_2 = gl.svg_2.append('g')
   .attr('id','tilemap_g_2');
+
+  //add more tilemap SVG containters here as needed
   
+  //parse the topoJSON
   d3.json('tiles-topo-us.json', function showData(error, tilegram) {
+
+    if (error) throw (error);
+
     gl.tiles = topojson.feature(tilegram, tilegram.objects.tiles);
     gl.tile_bbox = tilegram.bbox;
     
@@ -124,15 +119,16 @@ function loadTiles() {
     gl.path = d3.geoPath()
     .projection(scale(gl.scaling_factor)); 
 
+    //add state prefixes to each tile
     tilegram.objects.tiles.geometries.forEach(function (geometry) {
       if (gl.stateCodes.indexOf(geometry.properties.state) === -1) {
         gl.stateCodes.push(geometry.properties.state);
         gl.stateNames.push(_.find(stateCodesWithNames, { 'code': geometry.properties.state }).state);
-        // gl.colorValues.push(_.find(data, { 'code': geometry.properties.state }).value);
       }
     });
   });
 
+  //bind the parsed TopoJSON to their respective SVG containers (d3.json is a bit slow, hence the interval loop)
   var checkExist = setInterval(function() {
     if (gl.tiles != undefined) {        
       gl.tilemap_g_0.datum(gl.tiles);
@@ -144,36 +140,29 @@ function loadTiles() {
     }
   }, 100); // check every 100ms
 
+  //declare the tilemaps and populate the tilemap instance array
   gl.tilemap_instances[0] = paired_tilemap();
   gl.tilemap_instances[1] = tilemap();
   gl.tilemap_instances[2] = tilemap();
+  //add more (paired) tilemaps here as needed
   
 }
 
-function nest(seq,keys) {
-  if (!keys.length) {
-    return seq;
-  }
-  var first = keys[0];
-  var rest = keys.slice(1);
-  return _.mapValues(_.groupBy(seq, first), function (value) { 
-    return nest(value, rest);
-  });
-}
-
+//main rendering function for drawing and updating the tilemaps
 function render() {
+
+  //set the dimensions of the tilemaps' SVG containers
   
   gl.svg_0.style('width',gl.double_svg_w + 'px')
-               .style('height',gl.double_svg_h + 'px');
+          .style('height',gl.double_svg_h + 'px');
 
   gl.svg_1.style('width',gl.svg_w + 'px')
-               .style('height',gl.svg_h + 'px');
+          .style('height',gl.svg_h + 'px');
 
   gl.svg_2.style('width',gl.svg_w + 'px')
-               .style('height',gl.svg_h + 'px');   
+          .style('height',gl.svg_h + 'px');   
 
-  var animation_rates = _.sampleSize([1,2,3,4,5],5);
-
+  //update the outgoing animated arcs, should they exist
   d3.selectAll('.outgoing_arc').transition()
   .duration(100)
   .style('animation',function(d) {
@@ -226,6 +215,7 @@ function render() {
     return "M" + origin_state[0] + "," + origin_state[1] + "A" + dr + "," + dr + " 0 0,1 " + dest_state[0] + "," + dest_state[1];
   });
 
+  //update the incoming animated arcs, should they exist
   d3.selectAll('.incoming_arc').transition()
   .duration(100)
   .style('animation',function(d) {
@@ -284,6 +274,7 @@ function render() {
 
 }
 
+//initialization upon load
 window.addEventListener('load', function() {
   var single_w = d3.select('.single').style('width').indexOf('p');
   gl.svg_w = +d3.select('.single').style('width').substr(0,single_w);
@@ -301,6 +292,7 @@ window.addEventListener('load', function() {
   gl.stateNames = [];
   gl.tilemap_instances = [];
 
+  //load the migration graph (d3.tsv can be slow)
   d3.tsv('data/graph.tsv',function(error,data) {
     if (error) throw (error);
 
@@ -308,6 +300,12 @@ window.addEventListener('load', function() {
     
   });  
 
+  //query function that can be called from the console for updating static tilemap instances 
+  // requires a tilemap index, a query (a column name in data/graph.tsv), and a direction (inbound / outbound) 
+  //
+  //usage example 1: gl.loadQuery("1","JobTechnology","outbound")
+  //usage example 2: gl.loadQuery("2","HousingQuery","inbound")
+  //
   gl.loadQuery = function(tilemap,query,flowtype){      
     
     gl.tilemap_instances[tilemap].results(loadFlows(query,flowtype));
@@ -316,29 +314,11 @@ window.addEventListener('load', function() {
     render();    
    
   };
-
-  gl.originQuery = function(origin,query){
-    originFlows(origin,query);
-    var checkExist = setInterval(function() {
-      if (gl.dest_counts != []) {        
-        render();      
-        clearInterval(checkExist);
-      }
-    }, 100);
-  };
-
-   gl.destQuery = function(dest,query){
-    destFlows(dest,query);
-    var checkExist = setInterval(function() {
-      if (gl.origin_counts != []) {        
-        render();      
-        clearInterval(checkExist);
-      }
-    }, 100);
-  };
   
   loadTiles();
 
+  // some initial queries that occur 500ms after on page load
+  // slight delay to accommodate the slowness of d3.tsv
   setTimeout(function(){
     // Hide the address bar!
     gl.loadQuery("1","AllQueries","outbound");
@@ -347,6 +327,8 @@ window.addEventListener('load', function() {
 
 });
 
+//function to specify what happens when resizing the page, 
+//including change of orientation from portrait to landscape on mobile
 window.onresize = function(e) {  
 
   var single_w = d3.select('.single').style('width').indexOf('p');
@@ -361,7 +343,7 @@ window.onresize = function(e) {
   gl.path = d3.geoPath()
   .projection(scale(gl.scaling_factor)); 
 
-  
+  //check the orientation of the display
   var checkOrientation = setInterval(function() {
 
     gl.orientation_changed = false;
