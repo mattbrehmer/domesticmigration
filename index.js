@@ -27,6 +27,7 @@ var gl = {
   scaling_factor: undefined,
   orientation_changed: undefined,
   loadQuery: undefined,
+  loadPairedQuery: undefined,
   migration_graph: undefined
 };
 
@@ -314,6 +315,28 @@ window.addEventListener('load', function() {
     render();    
    
   };
+
+  gl.loadPairedQuery = function(tilemap, query) {
+
+    gl.tilemap_instances[tilemap].query(query);
+
+    render();
+
+  };
+
+  gl.changePairedQueryState = function(tilemap,state,flowtype) {
+    if (flowtype == "outbound") {
+      gl.tilemap_instances[tilemap].selected_origin(state);
+      gl.tilemap_instances[tilemap].selected_dest("");
+    }
+    else {
+      gl.tilemap_instances[tilemap].selected_origin("");
+      gl.tilemap_instances[tilemap].selected_dest(state);
+    }
+    
+    render();
+
+  }
   
   loadTiles();
 

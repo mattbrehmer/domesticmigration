@@ -12,6 +12,11 @@ body {
   font-size: 0.6em;
 }
 
+.caption {
+  color: #fff;
+  font-size: 0.8em;
+}
+
 .state-label {
   fill: #222;
   fill-opacity: .9;

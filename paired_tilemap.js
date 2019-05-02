@@ -3,6 +3,12 @@ paired_tilemap = function() {
   //paremeterizable properties for a paired tilemap (getter/setter functions follow)
   var params = {},
       query = "AllQueries",
+      selected_origin = "",
+      selected_origin_d = undefined,
+      selected_origin_i = -1,
+      selected_dest = "",
+      selected_dest_d = undefined,
+      selected_dest_i = -1,
       origin_color_scale_max = 1,
       origin_color_scale = d3.scaleLinear(),
       dest_color_scale_max = 1,
@@ -185,132 +191,7 @@ paired_tilemap = function() {
 
         d3.event.preventDefault(); 
 
-        d3.select('.origin_legend').style('visibility','hidden');
-        d3.select('.dest_legend').style('visibility','visible');
-
-        d3.selectAll('.origin_tile').select('path').attr('fill', origin_color_scale(0));
-        d3.selectAll('.dest_tile').select('path').attr('fill', dest_color_scale(0));
-        d3.select('.arcs').remove();
-        d3.selectAll('.origin_tile').select('path').attr('stroke', '#222222');
-        d3.selectAll('.dest_tile').select('path').attr('stroke', '#222222');
-
-        d3.select('.dest_linear_gradient_start')
-        .attr('stop-color', d3.lab("#deebf7"));
-
-        d3.select('.dest_linear_gradient_mid')
-        .attr('stop-color', d3.lab("#9ecae1"));
-
-        d3.select('.dest_linear_gradient_end')
-        .attr('stop-color', d3.lab("#3182bd"));
-
-        origin_color_scale.domain([0,(origin_color_scale_max / 2),origin_color_scale_max]);
-        
-        var flow_array = _.filter(gl.migration_graph, ['Origin_State', gl.stateNames[i]]);
-        flow_array = _.sortBy(flow_array, [function(d) { return -d[query]; }]);
-
-        dest_color_scale_max = (flow_array.length == 0) ? 1 : d3.max(flow_array, function(d) { 
-          return +d[query];
-        });        
-        
-        d3.select('#dest_legend_text_end')
-        .text(dest_color_scale.domain()[2]);
-
-        dest_color_scale.domain([0,(dest_color_scale_max / 2),dest_color_scale_max]);
-
-        flow_array.forEach(function (d){
-          if (d.Dest_State != "District of Columbia") {
-            var dest_name = _.find(gl.stateCodesWithNames, {'state': d.Dest_State }).code;
-
-            d3.select('#dest_tile_' + dest_name).select('path').attr('fill', dest_color_scale(+d[query]));
-          }
-        });
-        
-        var arcdata = [];
-
-        var links = [];
-
-        for (var h = 0; h < 5; h++){
-          if (flow_array[h].Dest_State != "District of Columbia") {
-            links.push(_.find(gl.stateCodesWithNames, {'state': flow_array[h].Dest_State }).code);
-          }
-        }
-
-        for (var j = 0; j < links.length; j++){
-          arcdata.push({
-            origin: gl.path.centroid(d),
-            origin_state: gl.stateCodes[i],
-            dest: gl.path.centroid(d3.select('#dest_tile_' + links[j])._groups[0][0].__data__),
-            dest_state: links[j]
-          });
-          if (gl.double_svg_h > gl.double_svg_w) {
-            arcdata[j].dest[1] = arcdata[j].dest[1] + gl.svg_h;
-          }
-          else {
-            arcdata[j].dest[0] = arcdata[j].dest[0] + gl.svg_w;
-          }
-        }
-
-        arc_links = this_paired_tilemap.append('g')
-        .attr('class','arcs');
-
-        var arc_enter = arc_links.selectAll('path')
-        .data(arcdata)
-        .enter();
-        
-        var animation_rates = [1,2,3,4,5];
-
-        arc_enter.append('path')
-        .attr('class','outgoing_arc')
-        .attr('id',function(d,i) {
-          return 'arc_' + d.origin_state + '_' + d.dest_state + '_' + animation_rates[i];
-        })
-        .attr('stroke', 'tomato')
-        .style('animation',function(d,i) {
-          var west_of_source = (d.dest[0] - d.origin[0]) < 0;
-          var south_of_source = (d.dest[1] - d.origin[1]) > 0;
-          if (gl.double_svg_h > gl.double_svg_w && west_of_source || gl.double_svg_h < gl.double_svg_w && south_of_source) {
-            return 'reverseflow ' + animation_rates[i] + 's linear infinite';
-          }
-          else {
-            return 'flow ' + animation_rates[i] + 's linear infinite';
-          }
-        })
-        .style('-webkit-animation',function(d,i) {
-          var west_of_source = (d.dest[0] - d.origin[0]) < 0;
-          var south_of_source = (d.dest[1] - d.origin[1]) > 0;
-          if (gl.double_svg_h > gl.double_svg_w && west_of_source || gl.double_svg_h < gl.double_svg_w && south_of_source) {
-            return 'reverseflow ' + animation_rates[i] + 's linear infinite';
-          }
-          else {
-            return 'flow ' + animation_rates[i] + 's linear infinite';
-          }
-        })
-        .attr('d', function(d) {
-          var dx = d.dest[0] - d.origin[0],
-					    dy = d.dest[1] - d.origin[1],
-              dr = Math.sqrt(dx * dx + dy * dy)*2;
-          var west_of_source = (d.dest[0] - d.origin[0]) < 0;
-          var south_of_source = (d.dest[1] - d.origin[1]) > 0;
-          if (gl.double_svg_h > gl.double_svg_w && west_of_source || gl.double_svg_h < gl.double_svg_w && south_of_source) {
-            return "M" + d.dest[0] + "," + d.dest[1] + "A" + dr + "," + dr + " 0 0,1 " + d.origin[0] + "," + d.origin[1];
-          }
-          return "M" + d.origin[0] + "," + d.origin[1] + "A" + dr + "," + dr + " 0 0,1 " + d.dest[0] + "," + d.dest[1];
-        });
-
-        d3.select('#origin_tile_' + gl.stateCodes[i]).select('path')
-        .attr('stroke', 'tomato')
-        .attr('fill','#fc9272');
-
-        d3.select('#dest_tile_' + gl.stateCodes[i]).select('path').attr('fill','#999');
-
-        d3.select('#origin_tile_' + gl.stateCodes[i]).moveToFront();
-
-        for (var k = 0; k < links.length; k++){
-          d3.select('#dest_tile_' + links[k]).select('path')
-          .attr('stroke', 'tomato');       
-          
-          d3.select('#dest_tile_' + links[k]).moveToFront();
-        }
+        selectOrigin(d,i);
 
       });      
 
@@ -515,131 +396,7 @@ paired_tilemap = function() {
         
         d3.event.preventDefault();         
 
-        d3.select('.origin_legend').style('visibility','visible');
-        d3.select('.dest_legend').style('visibility','hidden');
-
-        d3.selectAll('.dest_tile').select('path').attr('fill', dest_color_scale(0));
-        d3.selectAll('.origin_tile').select('path').attr('fill', origin_color_scale(0));        
-
-        d3.select('.arcs').remove();
-        d3.selectAll('.origin_tile').select('path').attr('stroke', '#222222');
-        d3.selectAll('.dest_tile').select('path').attr('stroke', '#222222');
-
-        d3.select('.origin_linear_gradient_start')
-        .attr('stop-color', d3.lab("#fee0d2"));
-
-        d3.select('.origin_linear_gradient_mid')
-        .attr('stop-color', d3.lab("#fc9272"));
-
-        d3.select('.origin_linear_gradient_end')
-        .attr('stop-color', d3.lab("#de2d26"));
-
-        var flow_array = _.filter(gl.migration_graph, ['Dest_State', gl.stateNames[i]]);
-        flow_array = _.sortBy(flow_array, [function(d) { return -d[query]; }]);
-
-        origin_color_scale_max = (flow_array.length == 0) ? 1 : d3.max(flow_array, function(d) { 
-          return +d[query];
-        });
-
-        origin_color_scale.domain([0,(origin_color_scale_max / 2),origin_color_scale_max]);
-        
-        d3.select('#origin_legend_text_end')
-        .text(origin_color_scale.domain()[2]);
-
-        flow_array.forEach(function (d){
-          if (d.Origin_State != "District of Columbia") {
-            var origin_name = _.find(gl.stateCodesWithNames, {'state': d.Origin_State }).code;
-
-            d3.select('#origin_tile_' + origin_name).select('path').attr('fill', origin_color_scale(+d[query]));
-          }
-        });
-        
-        var arcdata = [];
-
-        var links = [];
-
-        for (var h = 0; h < 5; h++){
-          if (flow_array[h].Origin_State != "District of Columbia") {
-            links.push(_.find(gl.stateCodesWithNames, {'state': flow_array[h].Origin_State }).code);
-          }
-        }
-        
-        for (var j = 0; j < links.length; j++){
-          arcdata.push({
-            origin: gl.path.centroid(d3.select('#dest_tile_' + links[j])._groups[0][0].__data__),
-            origin_state: links[j] ,
-            dest: gl.path.centroid(d),
-            dest_state: gl.stateCodes[i]
-          });
-          if (gl.double_svg_h > gl.double_svg_w) {
-            arcdata[j].dest[1] = arcdata[j].dest[1] + gl.svg_h;
-          }
-          else {
-            arcdata[j].dest[0] = arcdata[j].dest[0] + gl.svg_w;
-          }
-        }
-
-        arc_links = this_paired_tilemap.append('g')
-        .attr('class','arcs');
-
-        var animation_rates = [1,2,3,4,5];
-
-        var arc_enter = arc_links.selectAll('path')
-        .data(arcdata)
-        .enter();
-
-        arc_enter.append('path')
-        .attr('class','incoming_arc')
-        .attr('id',function(d) {
-          return 'arc_' + d.origin_state + '_' + d.dest_state;
-        })
-        .attr('stroke', 'cornflowerblue')
-        .style('animation',function(d,i) {
-          var west_of_source = (d.dest[0] - d.origin[0]) < 0;
-          var south_of_source = (d.dest[1] - d.origin[1]) > 0;
-          if (gl.double_svg_h > gl.double_svg_w && west_of_source || gl.double_svg_h < gl.double_svg_w && south_of_source) {
-            return 'flow ' + animation_rates[i] + 's linear infinite';
-          }
-          else {
-            return 'reverseflow ' + animation_rates[i] + 's linear infinite';
-          }
-        })
-        .style('-webkit-animation',function(d,i) {
-          var west_of_source = (d.dest[0] - d.origin[0]) < 0;
-          var south_of_source = (d.dest[1] - d.origin[1]) > 0;
-          if (gl.double_svg_h > gl.double_svg_w && west_of_source || gl.double_svg_h < gl.double_svg_w && south_of_source) {
-            return 'flow ' + animation_rates[i] + 's linear infinite';
-          }
-          else {
-            return 'reverseflow ' + animation_rates[i] + 's linear infinite';
-          }
-        })
-        .attr('d', function(d) {
-          var dx = d.dest[0] - d.origin[0],
-					    dy = d.dest[1] - d.origin[1],
-              dr = Math.sqrt(dx * dx + dy * dy)*2;
-          var west_of_source = (d.dest[0] - d.origin[0]) < 0;
-          var south_of_source = (d.dest[1] - d.origin[1]) > 0;
-          if (gl.double_svg_h > gl.double_svg_w && west_of_source || gl.double_svg_h < gl.double_svg_w && south_of_source) {            
-            return "M" + d.origin[0] + "," + d.origin[1] + "A" + dr + "," + dr + " 0 0,1 " + d.dest[0] + "," + d.dest[1];
-          }
-          return "M" + d.dest[0] + "," + d.dest[1] + "A" + dr + "," + dr + " 0 0,1 " + d.origin[0] + "," + d.origin[1];
-        });
-
-        d3.select('#dest_tile_' + gl.stateCodes[i]).select('path')
-        .attr('stroke', 'cornflowerblue')
-        .attr('fill', '#9ecae1');
-  
-        d3.select('#origin_tile_' + gl.stateCodes[i]).select('path').attr('fill','#999');
-
-        d3.select('#dest_tile_' + gl.stateCodes[i]).moveToFront();
-
-        for (var k = 0; k < links.length; k++){
-          d3.select('#origin_tile_' + links[k]).select('path')
-          .attr('stroke', 'cornflowerblue');       
-          
-          d3.select('#origin_tile_' + links[k]).moveToFront();
-        }
+        selectDest(d,i);
 
       });  
 
@@ -686,6 +443,308 @@ paired_tilemap = function() {
         });
       };
 
+      function selectOrigin (d,i) {
+
+        d3.select('.origin_legend').style('visibility', 'hidden');
+        d3.select('.dest_legend').style('visibility', 'visible');
+
+        d3.selectAll('.origin_tile').select('path').attr('fill', origin_color_scale(0));
+        d3.selectAll('.dest_tile').select('path').attr('fill', dest_color_scale(0));
+        d3.select('.arcs').remove();
+        d3.selectAll('.origin_tile').select('path').attr('stroke', '#222222');
+        d3.selectAll('.dest_tile').select('path').attr('stroke', '#222222');
+        d3.select('.dest_linear_gradient_start')
+
+          .attr('stop-color', d3.lab("#deebf7"));
+
+        d3.select('.dest_linear_gradient_mid')
+          .attr('stop-color', d3.lab("#9ecae1"));
+
+        d3.select('.dest_linear_gradient_end')
+          .attr('stop-color', d3.lab("#3182bd"));
+
+        origin_color_scale.domain([0, (origin_color_scale_max / 2), origin_color_scale_max]);
+
+        selected_origin = gl.stateNames[i];
+        selected_origin_d = d;
+        selected_origin_i = i;
+        selected_dest = "";
+        selected_dest_d = undefined;
+        selected_dest_i = -1;
+
+        console.log({
+          'selected_origin': selected_origin,
+        });
+
+        var flow_array = _.filter(gl.migration_graph, ['Origin_State', gl.stateNames[i]]);
+        flow_array = _.sortBy(flow_array, [function (d) { return -d[query]; }]);
+
+        dest_color_scale_max = (flow_array.length == 0) ? 1 : d3.max(flow_array, function (d) {
+          return +d[query];
+        });
+
+        dest_color_scale.domain([0, (dest_color_scale_max / 2), dest_color_scale_max]);
+
+        flow_array.forEach(function (d) {
+          if (d.Dest_State != "District of Columbia") {
+            var dest_name = _.find(gl.stateCodesWithNames, { 'state': d.Dest_State }).code;
+
+            d3.select('#dest_tile_' + dest_name).select('path').attr('fill', dest_color_scale(+d[query]));
+          }
+        });
+
+        var arcdata = [];
+
+        var links = [];
+
+        for (var h = 0; h < 5; h++) {
+          if (flow_array[h].Dest_State != "District of Columbia") {
+            links.push(_.find(gl.stateCodesWithNames, { 'state': flow_array[h].Dest_State }).code);
+          }
+        }
+
+        for (var j = 0; j < links.length; j++) {
+          arcdata.push({
+            origin: gl.path.centroid(d),
+            origin_state: gl.stateCodes[i],
+            dest: gl.path.centroid(d3.select('#dest_tile_' + links[j])._groups[0][0].__data__),
+            dest_state: links[j]
+          });
+          if (gl.double_svg_h > gl.double_svg_w) {
+            arcdata[j].dest[1] = arcdata[j].dest[1] + gl.svg_h;
+          }
+          else {
+            arcdata[j].dest[0] = arcdata[j].dest[0] + gl.svg_w;
+          }
+        }
+
+        arc_links = this_paired_tilemap.append('g')
+          .attr('class', 'arcs');
+
+        var arc_enter = arc_links.selectAll('path')
+          .data(arcdata)
+          .enter();
+
+        var animation_rates = [1, 2, 3, 4, 5];
+
+        arc_enter.append('path')
+          .attr('class', 'outgoing_arc')
+          .attr('id', function (d, i) {
+            return 'arc_' + d.origin_state + '_' + d.dest_state + '_' + animation_rates[i];
+          })
+          .attr('stroke', 'tomato')
+          .style('animation', function (d, i) {
+            var west_of_source = (d.dest[0] - d.origin[0]) < 0;
+            var south_of_source = (d.dest[1] - d.origin[1]) > 0;
+            if (gl.double_svg_h > gl.double_svg_w && west_of_source || gl.double_svg_h < gl.double_svg_w && south_of_source) {
+              return 'reverseflow ' + animation_rates[i] + 's linear infinite';
+            }
+            else {
+              return 'flow ' + animation_rates[i] + 's linear infinite';
+            }
+          })
+          .style('-webkit-animation', function (d, i) {
+            var west_of_source = (d.dest[0] - d.origin[0]) < 0;
+            var south_of_source = (d.dest[1] - d.origin[1]) > 0;
+            if (gl.double_svg_h > gl.double_svg_w && west_of_source || gl.double_svg_h < gl.double_svg_w && south_of_source) {
+              return 'reverseflow ' + animation_rates[i] + 's linear infinite';
+            }
+            else {
+              return 'flow ' + animation_rates[i] + 's linear infinite';
+            }
+          })
+          .attr('d', function (d) {
+            var dx = d.dest[0] - d.origin[0],
+              dy = d.dest[1] - d.origin[1],
+              dr = Math.sqrt(dx * dx + dy * dy) * 2;
+            var west_of_source = (d.dest[0] - d.origin[0]) < 0;
+            var south_of_source = (d.dest[1] - d.origin[1]) > 0;
+            if (gl.double_svg_h > gl.double_svg_w && west_of_source || gl.double_svg_h < gl.double_svg_w && south_of_source) {
+              return "M" + d.dest[0] + "," + d.dest[1] + "A" + dr + "," + dr + " 0 0,1 " + d.origin[0] + "," + d.origin[1];
+            }
+            return "M" + d.origin[0] + "," + d.origin[1] + "A" + dr + "," + dr + " 0 0,1 " + d.dest[0] + "," + d.dest[1];
+          });
+
+        d3.select('#origin_tile_' + gl.stateCodes[i]).select('path')
+          .attr('stroke', 'tomato')
+          .attr('fill', '#fc9272');
+
+        d3.select('#dest_tile_' + gl.stateCodes[i]).select('path').attr('fill', '#999');
+
+        d3.select('#origin_tile_' + gl.stateCodes[i]).moveToFront();
+
+        for (var k = 0; k < links.length; k++) {
+          d3.select('#dest_tile_' + links[k]).select('path')
+            .attr('stroke', 'tomato');
+
+          d3.select('#dest_tile_' + links[k]).moveToFront();
+        }
+
+        d3.select('#dest_legend_text_end')
+          .text(dest_color_scale.domain()[2]);
+      }
+
+      function selectDest (d,i) {
+
+        d3.select('.origin_legend').style('visibility', 'visible');
+        d3.select('.dest_legend').style('visibility', 'hidden');
+
+        d3.selectAll('.dest_tile').select('path').attr('fill', dest_color_scale(0));
+        d3.selectAll('.origin_tile').select('path').attr('fill', origin_color_scale(0));
+
+        d3.select('.arcs').remove();
+        d3.selectAll('.origin_tile').select('path').attr('stroke', '#222222');
+        d3.selectAll('.dest_tile').select('path').attr('stroke', '#222222');
+
+        d3.select('.origin_linear_gradient_start')
+          .attr('stop-color', d3.lab("#fee0d2"));
+
+        d3.select('.origin_linear_gradient_mid')
+          .attr('stop-color', d3.lab("#fc9272"));
+
+        d3.select('.origin_linear_gradient_end')
+          .attr('stop-color', d3.lab("#de2d26"));
+
+        selected_dest = gl.stateNames[i];
+        selected_dest_d = d;
+        selected_dest_i = i;
+        selected_origin = "";
+        selected_origin_d = undefined;
+        selected_origin_i = -1;
+      
+        console.log({
+          'selected_dest': selected_dest
+        });
+
+        var flow_array = _.filter(gl.migration_graph, ['Dest_State', gl.stateNames[i]]);
+        flow_array = _.sortBy(flow_array, [function (d) { return -d[query]; }]);
+
+        origin_color_scale_max = (flow_array.length == 0) ? 1 : d3.max(flow_array, function (d) {
+          return +d[query];
+        });
+
+        origin_color_scale.domain([0, (origin_color_scale_max / 2), origin_color_scale_max]);
+
+        flow_array.forEach(function (d) {
+          if (d.Origin_State != "District of Columbia") {
+            var origin_name = _.find(gl.stateCodesWithNames, { 'state': d.Origin_State }).code;
+
+            d3.select('#origin_tile_' + origin_name).select('path').attr('fill', origin_color_scale(+d[query]));
+          }
+        });
+
+        var arcdata = [];
+
+        var links = [];
+
+        for (var h = 0; h < 5; h++) {
+          if (flow_array[h].Origin_State != "District of Columbia") {
+            links.push(_.find(gl.stateCodesWithNames, { 'state': flow_array[h].Origin_State }).code);
+          }
+        }
+
+        for (var j = 0; j < links.length; j++) {
+          arcdata.push({
+            origin: gl.path.centroid(d3.select('#dest_tile_' + links[j])._groups[0][0].__data__),
+            origin_state: links[j],
+            dest: gl.path.centroid(d),
+            dest_state: gl.stateCodes[i]
+          });
+          if (gl.double_svg_h > gl.double_svg_w) {
+            arcdata[j].dest[1] = arcdata[j].dest[1] + gl.svg_h;
+          }
+          else {
+            arcdata[j].dest[0] = arcdata[j].dest[0] + gl.svg_w;
+          }
+        }
+
+        arc_links = this_paired_tilemap.append('g')
+          .attr('class', 'arcs');
+
+        var animation_rates = [1, 2, 3, 4, 5];
+
+        var arc_enter = arc_links.selectAll('path')
+          .data(arcdata)
+          .enter();
+
+        arc_enter.append('path')
+          .attr('class', 'incoming_arc')
+          .attr('id', function (d) {
+            return 'arc_' + d.origin_state + '_' + d.dest_state;
+          })
+          .attr('stroke', 'cornflowerblue')
+          .style('animation', function (d, i) {
+            var west_of_source = (d.dest[0] - d.origin[0]) < 0;
+            var south_of_source = (d.dest[1] - d.origin[1]) > 0;
+            if (gl.double_svg_h > gl.double_svg_w && west_of_source || gl.double_svg_h < gl.double_svg_w && south_of_source) {
+              return 'flow ' + animation_rates[i] + 's linear infinite';
+            }
+            else {
+              return 'reverseflow ' + animation_rates[i] + 's linear infinite';
+            }
+          })
+          .style('-webkit-animation', function (d, i) {
+            var west_of_source = (d.dest[0] - d.origin[0]) < 0;
+            var south_of_source = (d.dest[1] - d.origin[1]) > 0;
+            if (gl.double_svg_h > gl.double_svg_w && west_of_source || gl.double_svg_h < gl.double_svg_w && south_of_source) {
+              return 'flow ' + animation_rates[i] + 's linear infinite';
+            }
+            else {
+              return 'reverseflow ' + animation_rates[i] + 's linear infinite';
+            }
+          })
+          .attr('d', function (d) {
+            var dx = d.dest[0] - d.origin[0],
+              dy = d.dest[1] - d.origin[1],
+              dr = Math.sqrt(dx * dx + dy * dy) * 2;
+            var west_of_source = (d.dest[0] - d.origin[0]) < 0;
+            var south_of_source = (d.dest[1] - d.origin[1]) > 0;
+            if (gl.double_svg_h > gl.double_svg_w && west_of_source || gl.double_svg_h < gl.double_svg_w && south_of_source) {
+              return "M" + d.origin[0] + "," + d.origin[1] + "A" + dr + "," + dr + " 0 0,1 " + d.dest[0] + "," + d.dest[1];
+            }
+            return "M" + d.dest[0] + "," + d.dest[1] + "A" + dr + "," + dr + " 0 0,1 " + d.origin[0] + "," + d.origin[1];
+          });
+
+        d3.select('#dest_tile_' + gl.stateCodes[i]).select('path')
+          .attr('stroke', 'cornflowerblue')
+          .attr('fill', '#9ecae1');
+
+        d3.select('#origin_tile_' + gl.stateCodes[i]).select('path').attr('fill', '#999');
+
+        d3.select('#dest_tile_' + gl.stateCodes[i]).moveToFront();
+
+        for (var k = 0; k < links.length; k++) {
+          d3.select('#origin_tile_' + links[k]).select('path')
+            .attr('stroke', 'cornflowerblue');
+
+          d3.select('#origin_tile_' + links[k]).moveToFront();
+        }
+
+        d3.select('#origin_legend_text_end')
+          .text(origin_color_scale.domain()[2]);
+      }
+
+      if (selected_origin == "" && selected_dest == "") {
+        selected_origin = "Illinois";
+        selected_dest = "";
+        var d = d3.select("#origin_tile_IL")._groups[0][0].__data__;
+        var i = 5;
+        selectOrigin(d,i);
+      }
+      else if (selected_origin != "") {
+        selected_dest = "";
+        var code = _.find(gl.stateCodesWithNames, { 'state': selected_origin }).code;
+        selected_origin_d = d3.select("#origin_tile_" + code)._groups[0][0].__data__;
+        selected_origin_i = gl.stateCodes.indexOf(code);
+        selectOrigin(selected_origin_d,selected_origin_i);
+      }
+      else {
+        var code = _.find(gl.stateCodesWithNames, { 'state': selected_dest }).code;
+        selected_dest_d = d3.select("#dest_tile_" + code)._groups[0][0].__data__;
+        selected_dest_i = gl.stateCodes.indexOf(code);
+        selectDest(selected_dest_d,selected_dest_i);
+      }
+
     });
   }
 
@@ -706,6 +765,22 @@ paired_tilemap = function() {
       return query;
     }
     query = x;
+    return paired_tilemap;
+  };
+
+  paired_tilemap.selected_origin = function (x) {
+    if (!arguments.length) {
+      return selected_origin;
+    }
+    selected_origin = x;
+    return paired_tilemap;
+  };
+
+  paired_tilemap.selected_dest = function (x) {
+    if (!arguments.length) {
+      return selected_dest;
+    }
+    selected_dest = x;
     return paired_tilemap;
   };
   
