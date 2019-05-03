@@ -320,32 +320,32 @@ window.addEventListener('load', function() {
   gl.tilemap_instances = [];
 
   gl.queryNames = [
-    { field: 'AllQueries', label: 'total number of housing and job queries'},
-    { field: 'HousingQuery', label: 'total number of housing queries'},
-    { field: 'HousingRent', label: 'number of rental housing queries'},
-    { field: 'HousingBuy', label: 'number of housing purchase queries'},
-    { field: 'HousingApartment', label: 'number of apartment queries'},
-    { field: 'HousingCondo', label: 'number of condominium queries'},
-    { field: 'HousingDuplex', label: 'number of duplex queries'},
-    { field: 'HousingTownhouse', label: 'number of townhouse queries'},
-    { field: 'HousingHouse', label: 'number of house queries'},
-    { field: 'HousingHome', label: 'number of home queries'},
-    { field: 'JobQuery', label: 'total number of job queries'},
-    { field: 'JobArchitectureEngineering', label: 'number of architecture / engineering job queries'},
-    { field: 'JobArt', label: 'number of art job queries'},
-    { field: 'JobBusiness', label: 'number of business job queries'},
-    { field: 'JobConstruction', label: 'number of construction job queries'},
-    { field: 'JobEducation', label: 'number of education job queries'},
-    { field: 'JobFinance', label: 'number of finance job queries'},
-    { field: 'JobFood', label: 'number of food job queries'},
-    { field: 'JobHealthcare', label: 'number of healthcare job queries'},
-    { field: 'JobLeisureHospitality', label: 'number of leisure / hospitality job queries'},
-    { field: 'JobManufacturing', label: 'number of manufacturing job queries'},
-    { field: 'JobRetail', label: 'number of retail job queries'},
-    { field: 'JobScience', label: 'number of science job queries'},
-    { field: 'JobTechnology', label: 'number of technology job queries'},
-    { field: 'JobTransportation', label: 'number of transportation job queries'},
-    { field: 'HousingJobRatio', label: 'ratio of housing / job queries'}
+    { field: 'AllQueries', label: 'all housing and job searches'},
+    { field: 'HousingQuery', label: 'housing searches'},
+    { field: 'HousingRent', label: 'rental housing searches'},
+    { field: 'HousingBuy', label: 'housing purchase searches'},
+    { field: 'HousingApartment', label: 'apartment searches'},
+    { field: 'HousingCondo', label: 'condominium searches'},
+    { field: 'HousingDuplex', label: 'duplex searches'},
+    { field: 'HousingTownhouse', label: 'townhouse searches'},
+    { field: 'HousingHouse', label: 'house searches'},
+    { field: 'HousingHome', label: 'home searches'},
+    { field: 'JobQuery', label: 'job searches'},
+    { field: 'JobArchitectureEngineering', label: 'architecture / engineering job searches'},
+    { field: 'JobArt', label: 'art job searches'},
+    { field: 'JobBusiness', label: 'business job searches'},
+    { field: 'JobConstruction', label: 'construction job searches'},
+    { field: 'JobEducation', label: 'education job searches'},
+    { field: 'JobFinance', label: 'finance job searches'},
+    { field: 'JobFood', label: 'food job searches'},
+    { field: 'JobHealthcare', label: 'healthcare job searches'},
+    { field: 'JobLeisureHospitality', label: 'leisure / hospitality job searches'},
+    { field: 'JobManufacturing', label: 'manufacturing job searches'},
+    { field: 'JobRetail', label: 'retail job searches'},
+    { field: 'JobScience', label: 'science job searches'},
+    { field: 'JobTechnology', label: 'technology job searches'},
+    { field: 'JobTransportation', label: 'transportation job searches'},
+    { field: 'HousingJobRatio', label: 'ratio of housing searches to job searches'}
   ];  	
 
   //load the migration graph (d3.tsv can be slow)
@@ -365,6 +365,30 @@ window.addEventListener('load', function() {
     .enter()
     .append('option')
     .text(function(d) { return d.label; })
+    .property('value', function (d) { return d.field; })
+    .property('selected', function (d) { return d.field === 'AllQueries' });
+
+  d3.select('#query_select_1')
+    .on('change', function () {
+      gl.loadQuery(1, d3.select(this).property("value"), "outbound")
+    })
+    .selectAll('option')
+    .data(gl.queryNames.slice(0,25))
+    .enter()
+    .append('option')
+    .text(function (d) { return d.label; })
+    .property('value', function (d) { return d.field; })
+    .property('selected', function (d) { return d.field === 'AllQueries' });
+
+  d3.select('#query_select_2')
+    .on('change', function () {
+      gl.loadQuery(2, d3.select(this).property("value"), "inbound")
+    })
+    .selectAll('option')
+    .data(gl.queryNames.slice(0,25))
+    .enter()
+    .append('option')
+    .text(function (d) { return d.label; })
     .property('value', function (d) { return d.field; })
     .property('selected', function (d) { return d.field === 'AllQueries' });
 
@@ -391,8 +415,8 @@ window.addEventListener('load', function() {
   //query function that can be called from the console for updating static tilemap instances 
   // requires a tilemap index, a query (a column name in data/graph.tsv), and a direction (inbound / outbound) 
   //
-  //usage example 1: gl.loadQuery("1","JobTechnology","outbound")
-  //usage example 2: gl.loadQuery("2","HousingQuery","inbound")
+  //usage example 1: gl.loadQuery(1,"JobTechnology","outbound")
+  //usage example 2: gl.loadQuery(2,"HousingQuery","inbound")
   //
   gl.loadQuery = function(tilemap,query,flowtype){      
     

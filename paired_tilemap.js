@@ -100,7 +100,7 @@ paired_tilemap = function() {
 
       origin_legend_enter.append('text')
       .attr('class','legend_text')
-      .text('0')
+      .text('1')
       .attr('text-anchor', "start")
       .attr('dy','-0.2em');
 
@@ -302,7 +302,7 @@ paired_tilemap = function() {
 
       dest_legend_enter.append('text')
       .attr('class','legend_text')
-      .text('0')
+      .text('1')
       .attr('text-anchor', "start")
       .attr('dy','-0.2em');
 
@@ -456,6 +456,8 @@ paired_tilemap = function() {
 
         d3.selectAll('.origin_tile').select('path').attr('fill', origin_color_scale(0));
         d3.selectAll('.dest_tile').select('path').attr('fill', dest_color_scale(0));
+        d3.selectAll('.origin_tile').select('path').style('opacity', 1);
+        d3.selectAll('.dest_tile').select('path').style('opacity', 1);
         d3.select('.arcs').remove();
         d3.selectAll('.origin_tile').select('path').attr('stroke', '#222222');
         d3.selectAll('.dest_tile').select('path').attr('stroke', '#222222');
@@ -496,6 +498,7 @@ paired_tilemap = function() {
             var dest_name = _.find(gl.stateCodesWithNames, { 'state': d.Dest_State }).code;
 
             d3.select('#dest_tile_' + dest_name).select('path').attr('fill', dest_color_scale(+d[query]));
+            d3.select('#dest_tile_' + dest_name).select('path').style('opacity',  (+d[query] == 1) ? 0.2 : 1);
           }
         });
 
@@ -604,6 +607,9 @@ paired_tilemap = function() {
         d3.selectAll('.dest_tile').select('path').attr('fill', dest_color_scale(0));
         d3.selectAll('.origin_tile').select('path').attr('fill', origin_color_scale(0));
 
+        d3.selectAll('.origin_tile').select('path').style('opacity', 1);
+        d3.selectAll('.dest_tile').select('path').style('opacity', 1);
+
         d3.select('.arcs').remove();
         d3.selectAll('.origin_tile').select('path').attr('stroke', '#222222');
         d3.selectAll('.dest_tile').select('path').attr('stroke', '#222222');
@@ -642,6 +648,7 @@ paired_tilemap = function() {
             var origin_name = _.find(gl.stateCodesWithNames, { 'state': d.Origin_State }).code;
 
             d3.select('#origin_tile_' + origin_name).select('path').attr('fill', origin_color_scale(+d[query]));
+            d3.select('#origin_tile_' + origin_name).select('path').style('opacity', (+d[query] == 1) ? 0.2 : 1);
           }
         });
 

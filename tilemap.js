@@ -93,7 +93,7 @@ tilemap = function() {
 
       legend_enter.append('text')
       .attr('class','legend_text')
-      .text('0')
+      .text('1')
       .attr('text-anchor', "start")
       .attr('dy','-0.2em');
 
