@@ -24,11 +24,13 @@ var gl = {
   path: undefined,
   stateCodes: undefined,
   stateNames: undefined,
+  sortedStateNames: undefined,
   scaling_factor: undefined,
   orientation_changed: undefined,
   loadQuery: undefined,
   loadPairedQuery: undefined,
-  migration_graph: undefined
+  migration_graph: undefined,
+  queryNames: undefined
 };
 
 //utility function for scaling the TopoJSON
@@ -124,9 +126,33 @@ function loadTiles() {
     tilegram.objects.tiles.geometries.forEach(function (geometry) {
       if (gl.stateCodes.indexOf(geometry.properties.state) === -1) {
         gl.stateCodes.push(geometry.properties.state);
-        gl.stateNames.push(_.find(stateCodesWithNames, { 'code': geometry.properties.state }).state);
+        gl.stateNames.push(_.find(stateCodesWithNames, { 'code': geometry.properties.state }).state);      
       }
     });
+    gl.sortedStateNames = [];
+
+    gl.stateNames.forEach(function (d){
+      gl.sortedStateNames.push(d);
+    });
+
+    gl.sortedStateNames = gl.sortedStateNames.sort()
+
+    d3.select('#location_select_0')
+      .on('change', function () {
+        if (gl.tilemap_instances[0].selected_dest() == '') {
+          gl.changePairedQueryState(0, d3.select(this).property("value"), 'outbound')
+        }
+        else {
+          gl.changePairedQueryState(0, d3.select(this).property("value"), 'inbound')
+        }
+      })
+      .selectAll('option')
+      .data(gl.sortedStateNames)
+      .enter()
+      .append('option')
+      .text(function (d) { return d; })
+      .property('value', function (d) { return d })
+      .property('selected', function (d) { return d === 'Illinois' });
   });
 
   //bind the parsed TopoJSON to their respective SVG containers (d3.json is a bit slow, hence the interval loop)
@@ -293,13 +319,74 @@ window.addEventListener('load', function() {
   gl.stateNames = [];
   gl.tilemap_instances = [];
 
+  gl.queryNames = [
+    { field: 'AllQueries', label: 'total number of housing and job queries'},
+    { field: 'HousingQuery', label: 'total number of housing queries'},
+    { field: 'HousingRent', label: 'number of rental housing queries'},
+    { field: 'HousingBuy', label: 'number of housing purchase queries'},
+    { field: 'HousingApartment', label: 'number of apartment queries'},
+    { field: 'HousingCondo', label: 'number of condominium queries'},
+    { field: 'HousingDuplex', label: 'number of duplex queries'},
+    { field: 'HousingTownhouse', label: 'number of townhouse queries'},
+    { field: 'HousingHouse', label: 'number of house queries'},
+    { field: 'HousingHome', label: 'number of home queries'},
+    { field: 'JobQuery', label: 'total number of job queries'},
+    { field: 'JobArchitectureEngineering', label: 'number of architecture / engineering job queries'},
+    { field: 'JobArt', label: 'number of art job queries'},
+    { field: 'JobBusiness', label: 'number of business job queries'},
+    { field: 'JobConstruction', label: 'number of construction job queries'},
+    { field: 'JobEducation', label: 'number of education job queries'},
+    { field: 'JobFinance', label: 'number of finance job queries'},
+    { field: 'JobFood', label: 'number of food job queries'},
+    { field: 'JobHealthcare', label: 'number of healthcare job queries'},
+    { field: 'JobLeisureHospitality', label: 'number of leisure / hospitality job queries'},
+    { field: 'JobManufacturing', label: 'number of manufacturing job queries'},
+    { field: 'JobRetail', label: 'number of retail job queries'},
+    { field: 'JobScience', label: 'number of science job queries'},
+    { field: 'JobTechnology', label: 'number of technology job queries'},
+    { field: 'JobTransportation', label: 'number of transportation job queries'},
+    { field: 'HousingJobRatio', label: 'ratio of housing / job queries'}
+  ];  	
+
   //load the migration graph (d3.tsv can be slow)
   d3.tsv('data/graph.tsv',function(error,data) {
     if (error) throw (error);
 
     gl.migration_graph = data;
     
-  });  
+  });
+  
+  d3.select('#query_select_0')
+    .on('change', function(){
+      gl.loadPairedQuery(0,d3.select(this).property("value"));
+    })
+    .selectAll('option')
+    .data(gl.queryNames)
+    .enter()
+    .append('option')
+    .text(function(d) { return d.label; })
+    .property('value', function (d) { return d.field; })
+    .property('selected', function (d) { return d.field === 'AllQueries' });
+
+  d3.select('#flowtype_select_0')
+    .on('change', function () {
+      if (d3.select(this).property("value") == 'outbound'){
+        gl.changePairedQueryState(0, gl.tilemap_instances[0].selected_dest(), 'outbound');        
+      }
+      else {
+        gl.changePairedQueryState(0, gl.tilemap_instances[0].selected_origin(), 'inbound');       
+      }
+    })
+    .selectAll('option')
+    .data([
+      { field: 'outbound', label: 'originating from' },
+      { field: 'inbound', label: 'about' }
+    ])
+    .enter()
+    .append('option')
+    .text(function(d) { return d.label; })
+    .property('value', function (d) { return d.field; })
+    .property('selected',function(d) { return d === 'originating from' });
 
   //query function that can be called from the console for updating static tilemap instances 
   // requires a tilemap index, a query (a column name in data/graph.tsv), and a direction (inbound / outbound) 

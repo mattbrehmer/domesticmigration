@@ -445,6 +445,12 @@ paired_tilemap = function() {
 
       function selectOrigin (d,i) {
 
+        d3.select("#flowtype_select_" + parent_svg.id.substr(-1, 1))
+          .property('selectedIndex', 0 );
+        
+        d3.select("#location_select_" + parent_svg.id.substr(-1, 1))
+          .property('selectedIndex', gl.sortedStateNames.indexOf(gl.stateNames[i]));
+
         d3.select('.origin_legend').style('visibility', 'hidden');
         d3.select('.dest_legend').style('visibility', 'visible');
 
@@ -581,10 +587,16 @@ paired_tilemap = function() {
         }
 
         d3.select('#dest_legend_text_end')
-          .text(dest_color_scale.domain()[2]);
+          .text(Math.round(dest_color_scale.domain()[2]));
       }
 
       function selectDest (d,i) {
+
+        d3.select("#flowtype_select_" + parent_svg.id.substr(-1, 1))
+          .property('selectedIndex', 1);
+
+        d3.select("#location_select_" + parent_svg.id.substr(-1, 1))
+          .property('selectedIndex', gl.sortedStateNames.indexOf(gl.stateNames[i]));
 
         d3.select('.origin_legend').style('visibility', 'visible');
         d3.select('.dest_legend').style('visibility', 'hidden');
@@ -721,7 +733,7 @@ paired_tilemap = function() {
         }
 
         d3.select('#origin_legend_text_end')
-          .text(origin_color_scale.domain()[2]);
+          .text(Math.round(origin_color_scale.domain()[2]));
       }
 
       if (selected_origin == "" && selected_dest == "") {

@@ -17,6 +17,12 @@ body {
   font-size: 0.8em;
 }
 
+select {
+  font-family: 'Lato',"Apple SD Gothic Neo", "Segoe UI Web Regular","wf_segoe-ui_normal","Segoe UI","Segoe UI Symbol","Myriad","Calibri","UnDotum","Damascus","Futura","Helvetica Neue","BBAlpha Sans","S60 Sans","Arial",sans-serif;
+  background-color: #222222;
+  font-weight: 400;
+}
+
 .state-label {
   fill: #222;
   fill-opacity: .9;
