@@ -19,6 +19,8 @@ paired_tilemap = function() {
 
       var this_paired_tilemap = d3.select(this);
 
+      var formatComma = d3.format(",");
+
       var parent_svg = d3.select(this)._groups[0][0].parentElement;
 
       var defs = d3.select("#" + parent_svg.id).select('defs');
@@ -516,12 +518,6 @@ paired_tilemap = function() {
         .style('font-size', (gl.scaling_factor * 1.05) + 'em')
         
         var hover_state_name = _.find(stateCodesWithNames, { 'code': d.properties.state }).state;
-        
-        tooltip_text.append('tspan')
-        .attr('x', (target.x < target.width) ? target.x : target.x - target.width * 0.5)
-        .attr('dx', '0.3em')
-        .attr('dy', '1.3em')
-        .text(hover_state_name + ':')
 
         if (selected_dest != '' && selected_dest != hover_state_name) {
           var flow_array = _.filter(gl.migration_graph, ['Dest_State', selected_dest]);
@@ -537,21 +533,47 @@ paired_tilemap = function() {
         .text(function () {
 
           if (selected_origin == hover_state_name) {
-            return '(set as origin)';
+            return 'Origin: ' + d.properties.state;
           }
           else if (selected_dest != '' && selected_dest == hover_state_name) {
-            return '(set as destination)';
+            return d.properties.state + ' is set as';
+          }
+          else if (selected_dest != '') {
+            if (query == 'HousingJobRatio') {
+              return d.properties.state + ' to ' + _.find(stateCodesWithNames, { 'state': selected_dest }).code + " has a";
+            }
+            else {
+              return (num_queries > 1) ? formatComma(num_queries) + ' searches' : '';
+            }
+          }
+          else {
+            return 'Click to set ' + d.properties.state;
+          }
+
+        });
+
+        tooltip_text.append('tspan')
+        .attr('x', (target.x < target.width) ? target.x : target.x - target.width * 0.5)
+        .attr('dx', '0.3em')
+        .attr('dy', '1.3em')
+        .text(function () {
+
+          if (selected_origin == hover_state_name) {
+            return '';
+          }
+          else if (selected_dest != '' && selected_dest == hover_state_name) {
+            return 'destination.';
           }
           else if (selected_dest != '') {
             if (query == 'HousingJobRatio') {
               return Math.round(num_queries) + ' : 1 housing to';
             }
             else {
-              return (num_queries > 1) ? num_queries + ' searches' : '';
+              return (num_queries > 1) ? ('from ' + d.properties.state + ' for ' + _.find(stateCodesWithNames, { 'state': selected_dest }).code) + '.': '';
             }
           }
           else {
-            return 'Click to set as'
+            return  'as origin.';
           }
 
         });
@@ -573,14 +595,16 @@ paired_tilemap = function() {
               return 'job search ratio.';
             }
             else {
-              return (num_queries > 1) ? ('for ' + _.find(stateCodesWithNames, { 'state': selected_dest }).code + ' (' + (origin_index + 1) + ' of 50)') : '';
+              return (num_queries > 1) ? 'Rank: ' + (origin_index + 1) + ' of 50.' : '';
             }
           }
           else {
-            return  'origin.';
+            return '';
           }
 
         });
+
+        
 
       }
 
@@ -644,7 +668,7 @@ paired_tilemap = function() {
         var links = [];
 
         for (var h = 0; h < 5; h++) {
-          if (flow_array[h].Dest_State != undefined && flow_array[h].Dest_State != "District of Columbia") {
+          if (flow_array[h] != undefined && flow_array[h].Dest_State != "District of Columbia") {
             links.push(_.find(gl.stateCodesWithNames, { 'state': flow_array[h].Dest_State }).code);
           }
         }
@@ -727,7 +751,7 @@ paired_tilemap = function() {
         }
 
         d3.select('#dest_legend_text_end')
-        .text(Math.round(dest_color_scale.domain()[2]) + (query == 'HousingJobRatio' ? ' : 1' : ''));
+        .text(formatComma(Math.round(dest_color_scale.domain()[2])) + (query == 'HousingJobRatio' ? ' : 1' : ''));
       }
 
       function hoverDest (target,path,d,i,tx,ty) {
@@ -758,12 +782,6 @@ paired_tilemap = function() {
         .attr('y', ((target.y < target.height) ? target.y + target.height : target.y - target.height) + ty)
         .style('font-size', (gl.scaling_factor * 1.05) + 'em')
 
-        tooltip_text.append('tspan')
-        .attr('x', (target.x - target.width * 0.5) + tx)
-        .attr('dx', '0.3em')
-        .attr('dy', '1.3em')
-        .text(_.find(stateCodesWithNames, { 'code': d.properties.state }).state + ':')
-
         var hover_state_name = _.find(stateCodesWithNames, { 'code': d.properties.state }).state;
 
         if (selected_origin != '' && selected_origin != hover_state_name) {
@@ -780,22 +798,48 @@ paired_tilemap = function() {
         .text(function(){
 
           if (selected_dest == hover_state_name) {
-            return '(set as destination)';
+            return 'Destination: ' + d.properties.state;
           }
           else if (selected_origin != '' && selected_origin == hover_state_name) {
-            return '(set as origin)';
+            return d.properties.state + ' is set as';
           }
           else if (selected_origin != '') {   
+            if (query == 'HousingJobRatio') {
+              return _.find(stateCodesWithNames, { 'state': selected_origin }).code + ' to ' + d.properties.state + " has a";
+            }
+            else {
+              return (num_queries > 1) ? (formatComma(num_queries) + ' searches') : '';
+            }         
+          }
+          else {
+            return 'Click to set ' + d.properties.state;
+          }         
+
+        });
+
+        tooltip_text.append('tspan')
+        .attr('x', (target.x - target.width * 0.5) + tx)
+        .attr('dx', '0.3em')
+        .attr('dy', '1.3em')
+        .text(function () {
+
+          if (selected_dest == hover_state_name) {
+            return '';
+          }
+          else if (selected_origin != '' && selected_origin == hover_state_name) {
+            return 'origin.';
+          }
+          else if (selected_origin != '') {
             if (query == 'HousingJobRatio') {
               return Math.round(num_queries) + ' : 1 housing to';
             }
             else {
-              return (num_queries > 1) ? (num_queries + ' searches') : '';
-            }         
+              return (num_queries > 1) ? ('about ' + d.properties.state + ' from ' + _.find(stateCodesWithNames, { 'state': selected_origin }).code) + '.' : '';
+            }
           }
           else {
-            return 'Click to set as'
-          }         
+            return 'as destination.'
+          }
 
         });
 
@@ -816,11 +860,11 @@ paired_tilemap = function() {
               return 'job search ratio.';
             }
             else {
-              return (num_queries > 1) ? ('from ' + _.find(stateCodesWithNames, { 'state': selected_origin }).code + ' (' + (dest_index + 1) + ' of 50)') : '';
+              return (num_queries > 1) ? 'Rank: ' + (dest_index + 1) + ' of 50.' : '';
             }
           }
           else {
-            return 'destination.'
+            return '';
           }
 
         });
@@ -970,7 +1014,7 @@ paired_tilemap = function() {
         }
 
         d3.select('#origin_legend_text_end')
-        .text(Math.round(origin_color_scale.domain()[2]) + (query == 'HousingJobRatio' ? ' : 1' : ''));
+        .text(formatComma(Math.round(origin_color_scale.domain()[2])) + (query == 'HousingJobRatio' ? ' : 1' : ''));
       }
 
       if (selected_origin == "" && selected_dest == "") {

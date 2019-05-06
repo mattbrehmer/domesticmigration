@@ -8,10 +8,6 @@ var stateCodesWithNames = [
       code : 'AK'
     },
     {
-      state : 'American Samoa',
-      code : 'AS'
-    },
-    {
       state : 'Arizona',
       code : 'AZ'
     },
@@ -36,20 +32,12 @@ var stateCodesWithNames = [
       code : 'DE'
     },
     {
-      state : 'Dist. of Columbia',
-      code : 'DC'
-    },
-    {
       state : 'Florida',
       code : 'FL'
     },
     {
       state : 'Georgia',
       code : 'GA'
-    },
-    {
-      state : 'Guam',
-      code : 'GU'
     },
     {
       state : 'Hawaii',
@@ -92,20 +80,12 @@ var stateCodesWithNames = [
       code : 'MD'
     },
     {
-      state : 'Marshall Islands',
-      code : 'MH'
-    },
-    {
       state : 'Massachusetts',
       code : 'MA'
     },
     {
       state : 'Michigan',
       code : 'MI'
-    },
-    {
-      state : 'Micronesia',
-      code : 'FM'
     },
     {
       state : 'Minnesota',
@@ -156,10 +136,6 @@ var stateCodesWithNames = [
       code : 'ND'
     },
     {
-      state : 'Northern Marianas',
-      code : 'MP'
-    },
-    {
       state : 'Ohio',
       code : 'OH'
     },
@@ -172,16 +148,8 @@ var stateCodesWithNames = [
       code : 'OR'
     },
     {
-      state : 'Palau',
-      code : 'PW'
-    },
-    {
       state : 'Pennsylvania',
       code : 'PA'
-    },
-    {
-      state : 'Puerto Rico',
-      code : 'PR'
     },
     {
       state : 'Rhode Island',
@@ -214,10 +182,6 @@ var stateCodesWithNames = [
     {
       state : 'Virginia',
       code : 'VA'
-    },
-    {
-      state : 'Virgin Islands',
-      code : 'VI'
     },
     {
       state : 'Washington',

@@ -12,6 +12,8 @@ tilemap = function() {
 
       var this_tilemap = d3.select(this);
 
+      var formatComma = d3.format(",");
+
       //determine the new maximum value among the query results
       color_scale_max = (results.length == 0) ? 1 : d3.max(results, function(d) { 
         return d.count;
@@ -103,7 +105,7 @@ tilemap = function() {
       legend_enter.append('text')
       .attr('class','legend_text')
       .attr('id','legend_text_end')
-      .text((results.length == 0) ? 1 : color_scale.domain()[2])
+      .text((results.length == 0) ? 1 : formatComma(color_scale.domain()[2]))
       .attr('text-anchor', "end")
       .attr('dy','-0.2em')
       .attr('transform', function(){
@@ -130,7 +132,7 @@ tilemap = function() {
       });
 
       legend_update.select('#legend_text_end')
-      .text((results.length == 0) ? 1 : color_scale.domain()[2])
+      .text((results.length == 0) ? 1 : formatComma(color_scale.domain()[2]))
       .attr('transform', function(){
         var w = parent_svg.style.width.indexOf('p');
         return 'translate(' + (+parent_svg.style.width.substr(0,w) / 3) + ',0)';
@@ -234,6 +236,11 @@ tilemap = function() {
           .attr('stroke-width', gl.scaling_factor * 4)
           .attr('stroke', (flowtype == 'outbound') ? 'tomato' : 'cornflowerblue');
 
+        var hover_state_name = _.find(stateCodesWithNames, { 'code': d.properties.state }).state;
+
+        var ranked_results = _.sortBy(results, ['count']).reverse();
+        var hover_index = _.findIndex(ranked_results, { 'state': hover_state_name });
+
         var tooltip_text = tooltip.append('text')
           .attr('class', 'tooltip_text')
           .attr('y', ((target.y < target.height) ? target.y + target.height : target.y - target.height))
@@ -248,19 +255,19 @@ tilemap = function() {
           .attr('x', (target.x < target.width) ? target.x : target.x - target.width * 0.5)
           .attr('dx', '0.3em')
           .attr('dy', '1.3em')
-          .text(_.find(stateCodesWithNames, { 'code': d.properties.state }).state + ':');
+          .text(formatComma(_.find(results, { 'code': d.properties.state }).count) + ' searches');
 
         tooltip_text.append('tspan')
           .attr('x', (target.x < target.width) ? target.x : target.x - target.width * 0.5)
           .attr('dx', '0.3em')
           .attr('dy', '1.3em')
-          .text(_.find(results, { 'code': d.properties.state }).count + ' searches');
+          .text(((flowtype == 'outbound') ? 'from ' : 'about ') + d.properties.state + '.');
 
         tooltip_text.append('tspan')
           .attr('x', (target.x < target.width) ? target.x : target.x - target.width * 0.5)
           .attr('dx', '0.3em')
           .attr('dy', '1.3em')
-          .text((flowtype == 'outbound') ? 'from here.' : 'about here.');
+          .text('Rank: ' + (hover_index + 1) + ' of 50.');
 
       }
 
