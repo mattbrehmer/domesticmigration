@@ -543,7 +543,7 @@ paired_tilemap = function() {
               return d.properties.state + ' to ' + _.find(stateCodesWithNames, { 'state': selected_dest }).code + " has a";
             }
             else {
-              return (num_queries > 1) ? formatComma(num_queries) + ' searches' : '';
+              return (num_queries > 1) ? formatComma(num_queries) + ' searches' : 'No searches';
             }
           }
           else {
@@ -569,7 +569,7 @@ paired_tilemap = function() {
               return Math.round(num_queries) + ' : 1 housing to';
             }
             else {
-              return (num_queries > 1) ? ('from ' + d.properties.state + ' for ' + _.find(stateCodesWithNames, { 'state': selected_dest }).code) + '.': '';
+              return ('from ' + d.properties.state + ' for ' + _.find(stateCodesWithNames, { 'state': selected_dest }).code) + '.';
             }
           }
           else {
@@ -808,7 +808,7 @@ paired_tilemap = function() {
               return _.find(stateCodesWithNames, { 'state': selected_origin }).code + ' to ' + d.properties.state + " has a";
             }
             else {
-              return (num_queries > 1) ? (formatComma(num_queries) + ' searches') : '';
+              return (num_queries > 1) ? (formatComma(num_queries) + ' searches') : 'No searches';
             }         
           }
           else {
@@ -834,7 +834,7 @@ paired_tilemap = function() {
               return Math.round(num_queries) + ' : 1 housing to';
             }
             else {
-              return (num_queries > 1) ? ('about ' + d.properties.state + ' from ' + _.find(stateCodesWithNames, { 'state': selected_origin }).code) + '.' : '';
+              return ('for ' + d.properties.state + ' from ' + _.find(stateCodesWithNames, { 'state': selected_origin }).code) + '.';
             }
           }
           else {
