@@ -17,7 +17,7 @@ paired_tilemap = function() {
   function paired_tilemap (selection) {
     selection.each(function(data){
 
-      this_paired_tilemap = d3.select(this);
+      var this_paired_tilemap = d3.select(this);
 
       var parent_svg = d3.select(this)._groups[0][0].parentElement;
 
@@ -101,7 +101,8 @@ paired_tilemap = function() {
 
       origin_legend_enter.append('text')
       .attr('class','legend_text')
-      .text('1')
+      .attr('id', 'origin_legend_text_start')
+      .text('1' + (query == 'HousingJobRatio' ? ' : 1' : ''))
       .style('font-size', (gl.scaling_factor * 1.1) + 'em')
       .attr('text-anchor', "start")
       .attr('dy','-0.2em');
@@ -110,7 +111,7 @@ paired_tilemap = function() {
       .attr('class','legend_text')
       .style('font-size', (gl.scaling_factor * 1.1) + 'em')
       .attr('id','origin_legend_text_end')
-      .text('1')
+      .text('1' + (query == 'HousingJobRatio' ? ' : 1' : ''))
       .attr('text-anchor', "end")
       .attr('dy','-0.2em')
       .attr('transform', function(){
@@ -157,6 +158,9 @@ paired_tilemap = function() {
 
       origin_legend_update.selectAll('.legend_text')
       .style('font-size', (gl.scaling_factor * 1.1) + 'em')
+
+      origin_legend_update.select('#origin_legend_text_start')
+      .text('1' + (query == 'HousingJobRatio' ? ' : 1' : ''));
 
       origin_legend_update.select('#origin_legend_text_end')
       .attr('transform', function(){
@@ -320,8 +324,9 @@ paired_tilemap = function() {
 
       dest_legend_enter.append('text')
       .attr('class','legend_text')
+      .attr('id','dest_legend_text_start')
       .style('font-size', (gl.scaling_factor * 1.1) + 'em')
-      .text('1')
+      .text('1' + (query == 'HousingJobRatio' ? ' : 1' : ''))
       .attr('text-anchor', "start")
       .attr('dy','-0.2em');
 
@@ -329,7 +334,7 @@ paired_tilemap = function() {
       .attr('class','legend_text')
       .style('font-size', (gl.scaling_factor * 1.1) + 'em')
       .attr('id','dest_legend_text_end')
-      .text('1')
+      .text('1' + (query == 'HousingJobRatio' ? ' : 1' : ''))
       .attr('text-anchor', "end")
       .attr('dy','-0.2em')
       .attr('transform', function(){
@@ -376,6 +381,9 @@ paired_tilemap = function() {
 
       dest_legend_update.selectAll('legend_text')
       .style('font-size', (gl.scaling_factor * 1.1) + 'em');
+
+      dest_legend_update.select('#dest_legend_text_start')
+      .text('1' + (query == 'HousingJobRatio' ? ' : 1' : ''));
 
       dest_legend_update.select('#dest_legend_text_end')
       .attr('transform', function(){
@@ -535,10 +543,15 @@ paired_tilemap = function() {
             return '(set as destination)';
           }
           else if (selected_dest != '') {
-            return (num_queries > 1) ? num_queries + ' searches' : '';
+            if (query == 'HousingJobRatio') {
+              return Math.round(num_queries) + ' : 1 housing to';
+            }
+            else {
+              return (num_queries > 1) ? num_queries + ' searches' : '';
+            }
           }
           else {
-            return 'Click to set.'
+            return 'Click to set as'
           }
 
         });
@@ -556,10 +569,15 @@ paired_tilemap = function() {
             return '';
           }
           else if (selected_dest != '') {
-            return (num_queries > 1) ? ('for ' + _.find(stateCodesWithNames, { 'state': selected_dest }).code + ' (' + (origin_index + 1) + ' of 50)') : '';
+            if (query == 'HousingJobRatio') {
+              return 'job search ratio.';
+            }
+            else {
+              return (num_queries > 1) ? ('for ' + _.find(stateCodesWithNames, { 'state': selected_dest }).code + ' (' + (origin_index + 1) + ' of 50)') : '';
+            }
           }
           else {
-            return 'as origin.'
+            return  'origin.';
           }
 
         });
@@ -594,7 +612,7 @@ paired_tilemap = function() {
         d3.select('.dest_linear_gradient_end')
           .attr('stop-color', d3.lab("#3182bd"));
 
-        origin_color_scale.domain([0, (origin_color_scale_max / 2), origin_color_scale_max]);
+        origin_color_scale.domain([0, (origin_color_scale_max / 2), origin_color_scale_max]).nice();
 
         selected_origin = gl.stateNames[i];
         selected_origin_d = d;
@@ -603,10 +621,6 @@ paired_tilemap = function() {
         selected_dest_d = undefined;
         selected_dest_i = -1;
 
-        console.log({
-          'selected_origin': selected_origin,
-        });
-
         var flow_array = _.filter(gl.migration_graph, ['Origin_State', gl.stateNames[i]]);
         flow_array = _.sortBy(flow_array, [function (d) { return -d[query]; }]);
 
@@ -614,7 +628,7 @@ paired_tilemap = function() {
           return +d[query];
         });
 
-        dest_color_scale.domain([0, (dest_color_scale_max / 2), dest_color_scale_max]);
+        dest_color_scale.domain([0, (dest_color_scale_max / 2), dest_color_scale_max]).nice();
 
         flow_array.forEach(function (d) {
           if (d.Dest_State != "District of Columbia") {
@@ -630,7 +644,7 @@ paired_tilemap = function() {
         var links = [];
 
         for (var h = 0; h < 5; h++) {
-          if (flow_array[h].Dest_State != "District of Columbia") {
+          if (flow_array[h].Dest_State != undefined && flow_array[h].Dest_State != "District of Columbia") {
             links.push(_.find(gl.stateCodesWithNames, { 'state': flow_array[h].Dest_State }).code);
           }
         }
@@ -713,7 +727,7 @@ paired_tilemap = function() {
         }
 
         d3.select('#dest_legend_text_end')
-          .text(Math.round(dest_color_scale.domain()[2]));
+        .text(Math.round(dest_color_scale.domain()[2]) + (query == 'HousingJobRatio' ? ' : 1' : ''));
       }
 
       function hoverDest (target,path,d,i,tx,ty) {
@@ -771,11 +785,16 @@ paired_tilemap = function() {
           else if (selected_origin != '' && selected_origin == hover_state_name) {
             return '(set as origin)';
           }
-          else if (selected_origin != '') {            
-            return (num_queries > 1) ? (num_queries + ' searches') : '';
+          else if (selected_origin != '') {   
+            if (query == 'HousingJobRatio') {
+              return Math.round(num_queries) + ' : 1 housing to';
+            }
+            else {
+              return (num_queries > 1) ? (num_queries + ' searches') : '';
+            }         
           }
           else {
-            return 'Click to set.'
+            return 'Click to set as'
           }         
 
         });
@@ -793,10 +812,15 @@ paired_tilemap = function() {
             return '';
           }
           else if (selected_origin != '') {
-            return (num_queries > 1) ? ('from ' + _.find(stateCodesWithNames, { 'state': selected_origin }).code + ' (' + (dest_index + 1) + ' of 50)') : '';
+            if (query == 'HousingJobRatio') {
+              return 'job search ratio.';
+            }
+            else {
+              return (num_queries > 1) ? ('from ' + _.find(stateCodesWithNames, { 'state': selected_origin }).code + ' (' + (dest_index + 1) + ' of 50)') : '';
+            }
           }
           else {
-            return 'as destination.'
+            return 'destination.'
           }
 
         });
@@ -840,10 +864,6 @@ paired_tilemap = function() {
         selected_origin_d = undefined;
         selected_origin_i = -1;
       
-        console.log({
-          'selected_dest': selected_dest
-        });
-
         var flow_array = _.filter(gl.migration_graph, ['Dest_State', gl.stateNames[i]]);
         flow_array = _.sortBy(flow_array, [function (d) { return -d[query]; }]);
 
@@ -851,7 +871,7 @@ paired_tilemap = function() {
           return +d[query];
         });
 
-        origin_color_scale.domain([0, (origin_color_scale_max / 2), origin_color_scale_max]);
+        origin_color_scale.domain([0, (origin_color_scale_max / 2), origin_color_scale_max]).nice();
 
         flow_array.forEach(function (d) {
           if (d.Origin_State != "District of Columbia") {
@@ -950,7 +970,7 @@ paired_tilemap = function() {
         }
 
         d3.select('#origin_legend_text_end')
-          .text(Math.round(origin_color_scale.domain()[2]));
+        .text(Math.round(origin_color_scale.domain()[2]) + (query == 'HousingJobRatio' ? ' : 1' : ''));
       }
 
       if (selected_origin == "" && selected_dest == "") {
