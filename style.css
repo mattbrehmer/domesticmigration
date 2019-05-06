@@ -7,7 +7,7 @@ body {
   color: #222;
 }
 
-.legend_text {
+.legend_text, .tooltip_text {
   fill: #fff;
   font-size: 0.6em;
 }

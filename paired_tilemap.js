@@ -78,6 +78,7 @@ paired_tilemap = function() {
 
       origin_legend_enter.append('rect')
       .attr('id', parent_svg.id + '_origin_legend_swatch')
+      .attr('rx', 5)
       .attr('width', function() {
         var w = parent_svg.style.width.indexOf('p');
         var h = parent_svg.style.height.indexOf('p');
@@ -101,11 +102,13 @@ paired_tilemap = function() {
       origin_legend_enter.append('text')
       .attr('class','legend_text')
       .text('1')
+      .style('font-size', (gl.scaling_factor * 1.1) + 'em')
       .attr('text-anchor', "start")
       .attr('dy','-0.2em');
 
       origin_legend_enter.append('text')
       .attr('class','legend_text')
+      .style('font-size', (gl.scaling_factor * 1.1) + 'em')
       .attr('id','origin_legend_text_end')
       .text('1')
       .attr('text-anchor', "end")
@@ -152,6 +155,9 @@ paired_tilemap = function() {
         return ht / swatch_h;
       });
 
+      origin_legend_update.selectAll('.legend_text')
+      .style('font-size', (gl.scaling_factor * 1.1) + 'em')
+
       origin_legend_update.select('#origin_legend_text_end')
       .attr('transform', function(){
         var w = parent_svg.style.width.indexOf('p');
@@ -172,6 +178,7 @@ paired_tilemap = function() {
       var origin_tiles_enter = origin_tiles.enter()
       .append("g")
       .attr("class","origin_tile")
+      .style('cursor', 'pointer')
       .attr("id", function (d) {
         return "origin_tile_" + d.properties.state;
       });
@@ -193,7 +200,17 @@ paired_tilemap = function() {
 
         selectOrigin(d,i);
 
-      });      
+      })
+      .on('mouseover', function (d, i) {
+        d3.event.preventDefault();
+
+        hoverOrigin(d3.event.path[1].getBBox(), d3.select(this).attr('d'), d, i);
+      })
+      .on('mouseout', function (d) {
+        d3.event.preventDefault();
+
+        d3.select('#tooltip_' + d.properties.state).remove();
+      });   
 
       // origin tile labels
 
@@ -280,6 +297,7 @@ paired_tilemap = function() {
 
       dest_legend_enter.append('rect')
       .attr('id', parent_svg.id + '_dest_legend_swatch')
+      .attr('rx', 5)
       .attr('width', function() {
         var w = parent_svg.style.width.indexOf('p');
         var h = parent_svg.style.height.indexOf('p');
@@ -302,12 +320,14 @@ paired_tilemap = function() {
 
       dest_legend_enter.append('text')
       .attr('class','legend_text')
+      .style('font-size', (gl.scaling_factor * 1.1) + 'em')
       .text('1')
       .attr('text-anchor', "start")
       .attr('dy','-0.2em');
 
       dest_legend_enter.append('text')
       .attr('class','legend_text')
+      .style('font-size', (gl.scaling_factor * 1.1) + 'em')
       .attr('id','dest_legend_text_end')
       .text('1')
       .attr('text-anchor', "end")
@@ -354,6 +374,9 @@ paired_tilemap = function() {
         return ht / swatch_h;
       });
 
+      dest_legend_update.selectAll('legend_text')
+      .style('font-size', (gl.scaling_factor * 1.1) + 'em');
+
       dest_legend_update.select('#dest_legend_text_end')
       .attr('transform', function(){
         var w = parent_svg.style.width.indexOf('p');
@@ -374,6 +397,7 @@ paired_tilemap = function() {
       var dest_tiles_enter = dest_tiles.enter()
       .append("g")
       .attr("class","dest_tile")
+      .style('cursor','pointer')
       .attr("id", function (d) {
         return "dest_tile_" + d.properties.state;
       })
@@ -398,7 +422,20 @@ paired_tilemap = function() {
 
         selectDest(d,i);
 
-      });  
+      })
+      .on('mouseover', function(d,i){
+        d3.event.preventDefault();
+
+        var tx = (gl.double_svg_h > gl.double_svg_w ? 0 : gl.svg_w);
+        var ty = (gl.double_svg_h > gl.double_svg_w ? gl.svg_h : 0); 
+        
+        hoverDest(d3.event.path[1].getBBox(),d3.select(this).attr('d'),d,i,tx,ty);
+      })
+      .on('mouseout', function(d){
+        d3.event.preventDefault();
+
+        d3.select('#tooltip_' + d.properties.state).remove();
+      });
 
       //text labels for dest tiles
 
@@ -442,6 +479,92 @@ paired_tilemap = function() {
           this.parentNode.appendChild(this);
         });
       };
+
+      function hoverOrigin(target, path, d, i) {
+
+        var origin_tooltip = this_paired_tilemap.append('g')
+          .attr('class', 'origin_tooltip')
+          .attr('id', 'tooltip_' + d.properties.state);
+
+        origin_tooltip.append('path')
+        .attr('d', path)
+        .attr('fill', 'none')
+        .attr('stroke-width', gl.scaling_factor * 4)
+        .attr('stroke', (selected_dest == '') ? 'tomato' : 'cornflowerblue');
+
+        origin_tooltip.append('rect')
+        .attr('rx', 5)
+        .attr('width', target.width * 2)
+        .attr('height', target.height)
+        .attr('x', (target.x < target.width) ? target.x : target.x - target.width * 0.5)
+        .attr('y', (target.y < target.height) ? target.y + target.height : target.y - target.height)
+        .attr('fill', '#333')
+        .attr('stroke-width', gl.scaling_factor * 4)
+        .attr('stroke', (selected_dest == '') ? 'tomato' : 'cornflowerblue');
+
+        var tooltip_text = origin_tooltip.append('text')
+        .attr('class', 'tooltip_text')
+        .attr('y', (target.y < target.height) ? target.y + target.height : target.y - target.height)
+        .style('font-size', (gl.scaling_factor * 1.05) + 'em')
+        
+        var hover_state_name = _.find(stateCodesWithNames, { 'code': d.properties.state }).state;
+        
+        tooltip_text.append('tspan')
+        .attr('x', (target.x < target.width) ? target.x : target.x - target.width * 0.5)
+        .attr('dx', '0.3em')
+        .attr('dy', '1.3em')
+        .text(hover_state_name + ':')
+
+        if (selected_dest != '' && selected_dest != hover_state_name) {
+          var flow_array = _.filter(gl.migration_graph, ['Dest_State', selected_dest]);
+          flow_array = _.sortBy(flow_array, [function (d) { return -d[query]; }]);
+          var origin_index = _.findIndex(flow_array, { 'Origin_State': hover_state_name });
+          var num_queries = flow_array[origin_index][query];
+        }
+
+        tooltip_text.append('tspan')
+        .attr('x', (target.x < target.width) ? target.x : target.x - target.width * 0.5)
+        .attr('dx', '0.3em')
+        .attr('dy', '1.3em')
+        .text(function () {
+
+          if (selected_origin == hover_state_name) {
+            return '(set as origin)';
+          }
+          else if (selected_dest != '' && selected_dest == hover_state_name) {
+            return '(set as destination)';
+          }
+          else if (selected_dest != '') {
+            return (num_queries > 1) ? num_queries + ' searches' : '';
+          }
+          else {
+            return 'Click to set.'
+          }
+
+        });
+
+        tooltip_text.append('tspan')
+        .attr('x', (target.x < target.width) ? target.x : target.x - target.width * 0.5)
+        .attr('dx', '0.3em')
+        .attr('dy', '1.3em')
+        .text(function () {
+
+          if (selected_origin == hover_state_name) {
+            return '';
+          }
+          else if (selected_dest != '' && selected_dest == hover_state_name) {
+            return '';
+          }
+          else if (selected_dest != '') {
+            return (num_queries > 1) ? ('for ' + _.find(stateCodesWithNames, { 'state': selected_dest }).code + ' (' + (origin_index + 1) + ' of 50)') : '';
+          }
+          else {
+            return 'as origin.'
+          }
+
+        });
+
+      }
 
       function selectOrigin (d,i) {
 
@@ -591,6 +714,93 @@ paired_tilemap = function() {
 
         d3.select('#dest_legend_text_end')
           .text(Math.round(dest_color_scale.domain()[2]));
+      }
+
+      function hoverDest (target,path,d,i,tx,ty) {
+
+        var dest_tooltip = this_paired_tilemap.append('g')
+        .attr('class','dest_tooltip')
+        .attr('id','tooltip_' + d.properties.state);
+
+        dest_tooltip.append('path')
+        .attr('d',path)
+        .attr('transform','translate(' + tx + ',' + ty + ')')
+        .attr('fill','none')
+        .attr('stroke-width', gl.scaling_factor * 4)
+        .attr('stroke', (selected_dest == '') ? 'tomato' : 'cornflowerblue');
+
+        dest_tooltip.append('rect')
+        .attr('rx',5)
+        .attr('width',target.width * 2)
+        .attr('height', target.height)
+        .attr('x', (target.x - target.width * 0.5) + tx)
+        .attr('y', ((target.y < target.height) ? target.y + target.height : target.y - target.height) + ty)
+        .attr('fill','#333')
+        .attr('stroke-width', gl.scaling_factor * 4)
+        .attr('stroke', (selected_dest == '') ? 'tomato' : 'cornflowerblue');
+
+        var tooltip_text = dest_tooltip.append('text')
+        .attr('class','tooltip_text')
+        .attr('y', ((target.y < target.height) ? target.y + target.height : target.y - target.height) + ty)
+        .style('font-size', (gl.scaling_factor * 1.05) + 'em')
+
+        tooltip_text.append('tspan')
+        .attr('x', (target.x - target.width * 0.5) + tx)
+        .attr('dx', '0.3em')
+        .attr('dy', '1.3em')
+        .text(_.find(stateCodesWithNames, { 'code': d.properties.state }).state + ':')
+
+        var hover_state_name = _.find(stateCodesWithNames, { 'code': d.properties.state }).state;
+
+        if (selected_origin != '' && selected_origin != hover_state_name) {
+          var flow_array = _.filter(gl.migration_graph, ['Origin_State', selected_origin]);
+          flow_array = _.sortBy(flow_array, [function (d) { return -d[query]; }]);
+          var dest_index = _.findIndex(flow_array, { 'Dest_State': hover_state_name });
+          var num_queries = flow_array[dest_index][query];
+        }
+
+        tooltip_text.append('tspan')
+        .attr('x', (target.x - target.width * 0.5) + tx)
+        .attr('dx', '0.3em')
+        .attr('dy', '1.3em')
+        .text(function(){
+
+          if (selected_dest == hover_state_name) {
+            return '(set as destination)';
+          }
+          else if (selected_origin != '' && selected_origin == hover_state_name) {
+            return '(set as origin)';
+          }
+          else if (selected_origin != '') {            
+            return (num_queries > 1) ? (num_queries + ' searches') : '';
+          }
+          else {
+            return 'Click to set.'
+          }         
+
+        });
+
+        tooltip_text.append('tspan')
+        .attr('x', (target.x - target.width * 0.5) + tx)
+        .attr('dx', '0.3em')
+        .attr('dy', '1.3em')
+        .text(function () {
+
+          if (selected_dest == hover_state_name) {
+            return '';
+          }
+          else if (selected_origin != '' && selected_origin == hover_state_name) {
+            return '';
+          }
+          else if (selected_origin != '') {
+            return (num_queries > 1) ? ('from ' + _.find(stateCodesWithNames, { 'state': selected_origin }).code + ' (' + (dest_index + 1) + ' of 50)') : '';
+          }
+          else {
+            return 'as destination.'
+          }
+
+        });
+
       }
 
       function selectDest (d,i) {

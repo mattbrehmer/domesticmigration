@@ -79,6 +79,7 @@ tilemap = function() {
 
       legend_enter.append('rect')
       .attr('id', parent_svg.id + '_legend_swatch')
+      .attr('rx', 5)
       .attr('width', function() {
         var w = parent_svg.style.width.indexOf('p');
         return +parent_svg.style.width.substr(0,w) / 3;
