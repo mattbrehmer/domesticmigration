@@ -493,8 +493,8 @@ paired_tilemap = function() {
       function hoverOrigin(target, path, d, i) {
 
         var origin_tooltip = this_paired_tilemap.append('g')
-          .attr('class', 'origin_tooltip')
-          .attr('id', 'tooltip_' + d.properties.state);
+        .attr('class', 'origin_tooltip')
+        .attr('id', 'tooltip_' + d.properties.state);
 
         origin_tooltip.append('path')
         .attr('d', path)
@@ -517,7 +517,7 @@ paired_tilemap = function() {
         .attr('y', (target.y < target.height) ? target.y + target.height : target.y - target.height)
         .style('font-size', (gl.scaling_factor * 1.05) + 'em')
         
-        var hover_state_name = _.find(stateCodesWithNames, { 'code': d.properties.state }).state;
+        var hover_state_name = _.find(stateDetails, { 'code': d.properties.state }).state;
 
         if (selected_dest != '' && selected_dest != hover_state_name) {
           var flow_array = _.filter(gl.migration_graph, ['Dest_State', selected_dest]);
@@ -540,7 +540,7 @@ paired_tilemap = function() {
           }
           else if (selected_dest != '') {
             if (query == 'HousingJobRatio') {
-              return d.properties.state + ' to ' + _.find(stateCodesWithNames, { 'state': selected_dest }).code + " has a";
+              return d.properties.state + ' to ' + _.find(stateDetails, { 'state': selected_dest }).code + " has a";
             }
             else {
               return (num_queries > 1) ? formatComma(num_queries) + ' searches' : 'No searches';
@@ -569,7 +569,7 @@ paired_tilemap = function() {
               return Math.round(num_queries) + ' : 1 housing to';
             }
             else {
-              return ('from ' + d.properties.state + ' for ' + _.find(stateCodesWithNames, { 'state': selected_dest }).code) + '.';
+              return ('from ' + d.properties.state + ' for ' + _.find(stateDetails, { 'state': selected_dest }).code) + '.';
             }
           }
           else {
@@ -656,7 +656,7 @@ paired_tilemap = function() {
 
         flow_array.forEach(function (d) {
           if (d.Dest_State != "District of Columbia") {
-            var dest_name = _.find(gl.stateCodesWithNames, { 'state': d.Dest_State }).code;
+            var dest_name = _.find(gl.stateDetails, { 'state': d.Dest_State }).code;
 
             d3.select('#dest_tile_' + dest_name).select('path').attr('fill', dest_color_scale(+d[query]));
             d3.select('#dest_tile_' + dest_name).select('path').style('opacity',  (+d[query] == 1) ? 0.2 : 1);
@@ -669,7 +669,7 @@ paired_tilemap = function() {
 
         for (var h = 0; h < 5; h++) {
           if (flow_array[h] != undefined && flow_array[h].Dest_State != "District of Columbia") {
-            links.push(_.find(gl.stateCodesWithNames, { 'state': flow_array[h].Dest_State }).code);
+            links.push(_.find(gl.stateDetails, { 'state': flow_array[h].Dest_State }).code);
           }
         }
 
@@ -782,7 +782,7 @@ paired_tilemap = function() {
         .attr('y', ((target.y < target.height) ? target.y + target.height : target.y - target.height) + ty)
         .style('font-size', (gl.scaling_factor * 1.05) + 'em')
 
-        var hover_state_name = _.find(stateCodesWithNames, { 'code': d.properties.state }).state;
+        var hover_state_name = _.find(stateDetails, { 'code': d.properties.state }).state;
 
         if (selected_origin != '' && selected_origin != hover_state_name) {
           var flow_array = _.filter(gl.migration_graph, ['Origin_State', selected_origin]);
@@ -805,7 +805,7 @@ paired_tilemap = function() {
           }
           else if (selected_origin != '') {   
             if (query == 'HousingJobRatio') {
-              return _.find(stateCodesWithNames, { 'state': selected_origin }).code + ' to ' + d.properties.state + " has a";
+              return _.find(stateDetails, { 'state': selected_origin }).code + ' to ' + d.properties.state + " has a";
             }
             else {
               return (num_queries > 1) ? (formatComma(num_queries) + ' searches') : 'No searches';
@@ -834,7 +834,7 @@ paired_tilemap = function() {
               return Math.round(num_queries) + ' : 1 housing to';
             }
             else {
-              return ('for ' + d.properties.state + ' from ' + _.find(stateCodesWithNames, { 'state': selected_origin }).code) + '.';
+              return ('for ' + d.properties.state + ' from ' + _.find(stateDetails, { 'state': selected_origin }).code) + '.';
             }
           }
           else {
@@ -919,7 +919,7 @@ paired_tilemap = function() {
 
         flow_array.forEach(function (d) {
           if (d.Origin_State != "District of Columbia") {
-            var origin_name = _.find(gl.stateCodesWithNames, { 'state': d.Origin_State }).code;
+            var origin_name = _.find(gl.stateDetails, { 'state': d.Origin_State }).code;
 
             d3.select('#origin_tile_' + origin_name).select('path').attr('fill', origin_color_scale(+d[query]));
             d3.select('#origin_tile_' + origin_name).select('path').style('opacity', (+d[query] == 1) ? 0.2 : 1);
@@ -932,7 +932,7 @@ paired_tilemap = function() {
 
         for (var h = 0; h < 5; h++) {
           if (flow_array[h].Origin_State != "District of Columbia") {
-            links.push(_.find(gl.stateCodesWithNames, { 'state': flow_array[h].Origin_State }).code);
+            links.push(_.find(gl.stateDetails, { 'state': flow_array[h].Origin_State }).code);
           }
         }
 
@@ -1026,13 +1026,13 @@ paired_tilemap = function() {
       }
       else if (selected_origin != "") {
         selected_dest = "";
-        var code = _.find(gl.stateCodesWithNames, { 'state': selected_origin }).code;
+        var code = _.find(gl.stateDetails, { 'state': selected_origin }).code;
         selected_origin_d = d3.select("#origin_tile_" + code)._groups[0][0].__data__;
         selected_origin_i = gl.stateCodes.indexOf(code);
         selectOrigin(selected_origin_d,selected_origin_i);
       }
       else {
-        var code = _.find(gl.stateCodesWithNames, { 'state': selected_dest }).code;
+        var code = _.find(gl.stateDetails, { 'state': selected_dest }).code;
         selected_dest_d = d3.select("#dest_tile_" + code)._groups[0][0].__data__;
         selected_dest_i = gl.stateCodes.indexOf(code);
         selectDest(selected_dest_d,selected_dest_i);

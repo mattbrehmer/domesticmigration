@@ -236,7 +236,7 @@ tilemap = function() {
           .attr('stroke-width', gl.scaling_factor * 4)
           .attr('stroke', (flowtype == 'outbound') ? 'tomato' : 'cornflowerblue');
 
-        var hover_state_name = _.find(stateCodesWithNames, { 'code': d.properties.state }).state;
+        var hover_state_name = _.find(stateDetails, { 'code': d.properties.state }).state;
 
         var ranked_results = _.sortBy(results, ['count']).reverse();
         var hover_index = _.findIndex(ranked_results, { 'state': hover_state_name });

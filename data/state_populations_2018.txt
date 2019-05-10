@@ -1,0 +1,51 @@
+Rank	State	Population
+1	California	39557045
+2	Texas	28701845
+3	Florida	21299325
+4	New York	19542209
+5	Pennsylvania	12807060
+6	Illinois	12741080
+7	Ohio	11689442
+8	Georgia	10519475
+9	North Carolina	10383620
+10	Michigan	9995915
+11	New Jersey	8908520
+12	Virginia	8517685
+13	Washington	7535591
+14	Arizona	7171646
+15	Massachusetts	6902149
+16	Tennessee	6770010
+17	Indiana	6691878
+18	Missouri	6126452
+19	Maryland	6042718
+20	Wisconsin	5813568
+21	Colorado	5695564
+22	Minnesota	5611179
+23	South Carolina	5084127
+24	Alabama	4887871
+25	Louisiana	4659978
+26	Kentucky	4468402
+27	Oregon	4190713
+28	Oklahoma	3943079
+29	Connecticut	3572665
+30	Utah	3161105
+31	Iowa	3156145
+32	Nevada	3034392
+33	Arkansas	3013825
+34	Mississippi	2986530
+35	Kansas	2911505
+36	New Mexico	2095428
+37	Nebraska	1929268
+38	West Virginia	1805832
+39	Idaho	1754208
+40	Hawaii	1420491
+41	New Hampshire	1356458
+42	Maine	1338404
+43	Montana	1062305
+44	Rhode Island	1057315
+45	Delaware	967171
+46	South Dakota	882235
+47	North Dakota	760077
+48	Alaska	737438
+49	Vermont	626299
+50	Wyoming	577737

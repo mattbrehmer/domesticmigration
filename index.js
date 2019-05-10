@@ -13,7 +13,7 @@ var gl = {
   svg_h: undefined,
   double_svg_w: undefined,
   double_svg_h: undefined,
-  stateCodesWithNames: undefined,
+  stateDetails: undefined,
   topojson: undefined,
   d3: undefined,
   tilemap: undefined,
@@ -49,7 +49,7 @@ function scale (scaleFactor) {
 function loadFlows(query,flowtype) {
   var flows = [];
 
-  gl.stateCodesWithNames.forEach(function(state) {
+  gl.stateDetails.forEach(function(state) {
     flows.push({
       'state': state.state,
       'code': state.code
@@ -126,7 +126,7 @@ function loadTiles() {
     tilegram.objects.tiles.geometries.forEach(function (geometry) {
       if (gl.stateCodes.indexOf(geometry.properties.state) === -1) {
         gl.stateCodes.push(geometry.properties.state);
-        gl.stateNames.push(_.find(stateCodesWithNames, { 'code': geometry.properties.state }).state);      
+        gl.stateNames.push(_.find(stateDetails, { 'code': geometry.properties.state }).state);      
       }
     });
     gl.sortedStateNames = [];
@@ -309,7 +309,7 @@ window.addEventListener('load', function() {
   var double_w = d3.select('.double').style('width').indexOf('p');
   gl.double_svg_w = +d3.select('.double').style('width').substr(0,double_w);
  
-  gl.stateCodesWithNames = window.stateCodesWithNames;
+  gl.stateDetails = window.stateDetails;
   gl.topojson = window.topojson;
   gl.d3 = window.d3;
   gl.tilemap = window.tilemap;
