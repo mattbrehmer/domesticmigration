@@ -370,19 +370,24 @@ window.addEventListener('load', function() {
 
   d3.select('#query_select_1')
     .on('change', function () {
-      gl.loadQuery(1, d3.select(this).property("value"), "outbound")
+      gl.loadQuery(1, d3.select(this).property("value"), "outbound", d3.select('#query_cb_1').property("checked"));
     })
     .selectAll('option')
-    .data(gl.queryNames.slice(0,25))
+    .data(gl.queryNames.slice(0, 25))
     .enter()
     .append('option')
     .text(function (d) { return d.label; })
     .property('value', function (d) { return d.field; })
     .property('selected', function (d) { return d.field === 'AllQueries' });
 
+  d3.select('#query_cb_1')
+    .on('change', function () {
+      gl.loadQuery(1, d3.select('#query_select_1').property("value"), "outbound", d3.select(this).property("checked"));
+    });
+
   d3.select('#query_select_2')
     .on('change', function () {
-      gl.loadQuery(2, d3.select(this).property("value"), "inbound")
+      gl.loadQuery(2, d3.select(this).property("value"), "inbound",false)
     })
     .selectAll('option')
     .data(gl.queryNames.slice(0,25))
@@ -415,13 +420,14 @@ window.addEventListener('load', function() {
   //query function that can be called from the console for updating static tilemap instances 
   // requires a tilemap index, a query (a column name in data/graph.tsv), and a direction (inbound / outbound) 
   //
-  //usage example 1: gl.loadQuery(1,"JobTechnology","outbound")
-  //usage example 2: gl.loadQuery(2,"HousingQuery","inbound")
+  //usage example 1: gl.loadQuery(1,"JobTechnology","outbound",false)
+  //usage example 2: gl.loadQuery(2,"HousingQuery","inbound",false)
   //
-  gl.loadQuery = function(tilemap,query,flowtype){      
+  gl.loadQuery = function(tilemap,query,flowtype,normalize){      
     
     gl.tilemap_instances[tilemap].results(loadFlows(query,flowtype));
     gl.tilemap_instances[tilemap].flowtype(flowtype);
+    gl.tilemap_instances[tilemap].normalize(normalize);
 
     render();    
    
@@ -455,8 +461,8 @@ window.addEventListener('load', function() {
   // slight delay to accommodate the slowness of d3.tsv
   setTimeout(function(){
     // Hide the address bar!
-    gl.loadQuery("1","AllQueries","outbound");
-    gl.loadQuery("2","AllQueries","inbound");
+    gl.loadQuery("1","AllQueries","outbound",false);
+    gl.loadQuery("2","AllQueries","inbound",false);
   }, 500);   
 
 });

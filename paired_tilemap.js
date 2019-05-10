@@ -234,7 +234,7 @@ paired_tilemap = function() {
       });
 
       var origin_tiles_update = origin_tiles.transition()
-      .duration(100);
+      .duration(500);
 
       origin_tiles_update.selectAll('path')
       .attr('d', gl.path);
@@ -465,7 +465,7 @@ paired_tilemap = function() {
       // update the dest tiles
 
       var dest_tiles_update = dest_tiles.transition()
-      .duration(100)
+      .duration(500)
       .attr('transform', function (d) {
         return 'translate(' + (gl.double_svg_h > gl.double_svg_w ? 0 : gl.svg_w) + ',' + (gl.double_svg_h > gl.double_svg_w ? gl.svg_h : 0) + ')';
       });
@@ -751,7 +751,7 @@ paired_tilemap = function() {
         }
 
         d3.select('#dest_legend_text_end')
-        .text(formatComma(Math.round(dest_color_scale.domain()[2])) + (query == 'HousingJobRatio' ? ' : 1' : ''));
+          .text(query == 'HousingJobRatio' ? Math.round(dest_color_scale.domain()[2]) + ' : 1' : formatComma(dest_color_scale.domain()[2]));
       }
 
       function hoverDest (target,path,d,i,tx,ty) {
