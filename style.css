@@ -12,9 +12,29 @@ body {
   font-size: 0.6em;
 }
 
+h1, h2, h3 {
+  color: #fff;
+}
+
+h3 a {
+  color: #fff;
+  text-decoration: none;
+}
+
+a {
+  color: skyblue;
+  text-decoration: none;
+}
+
+p, li {
+  color: #fff;
+  font-size: 1em;
+  font-weight: 400;
+}
+
 .caption {
   color: #fff;
-  font-size: 0.8em;
+  font-size: 1em;
   font-weight: 400;
   margin-bottom: 1.25%;
 }
@@ -38,21 +58,95 @@ select {
 
 .single {
   display: block;
-  margin: 1.25%;
-  width: 97.5%;
+  margin-top: 1.25%;
+  margin-bottom: 1.25%;
+  margin-left: 5%;
+  margin-right: 5%;
+  width: 90%;
 }
+
+#footerHolder {
+  left: 0px;
+  height: 2em;
+	right: 0px;
+	bottom: 0px;
+	background: #333;
+	color: white;
+  padding: 0px 0px 0px 5%;
+  line-height: 2em;
+	font-size: 0.5em;
+}
+
+.example {
+  color: skyblue;
+  cursor: pointer;
+}
+
 @media screen and (min-width: 506px) { 
   .single {
     float: left;
-    width: 48.125%;
+    width: 44%;
+    margin-right: 1%;
+  }
+
+  #beside {
+    margin-left: 1%;
     margin-right: 0%;
   }
+
+}
+
+@media screen 
+and (-webkit-min-device-pixel-ratio: 2) {
+  .caption, p {
+    font-size: 1.2em;
+  }
+
+  input[type=checkbox] {
+    -ms-transform: scale(2); /* IE */
+    -moz-transform: scale(2); /* FF */
+    -webkit-transform: scale(2); /* Safari and Chrome */
+    -o-transform: scale(2); /* Opera */
+    transform: scale(2);
+    padding: 10px;
+  }
+  
+  .checkboxtext
+  {
+    /* Checkbox text */
+    font-size: 110%;
+    display: inline;
+    padding-left: 0.25em;
+	  padding-right: 0.25em;
+  }
+
+  .state-label {
+    font-size: 2em;
+  }
+
+  select {
+    max-width: 100%;
+  }
+
+  #footerHolder {
+    height: 2em;
+    background: #333;
+    color: white;
+    position: relative;
+    padding: 0px 0px 0px 5%;
+    line-height: 2em;
+    font-size: 0.5em;
+  }
+
 }
 
 .double {
   display: block;
-  margin: 1.25%;
-  width: 97.5%;
+  width: 90%;
+  margin-top: 1.25%;
+  margin-bottom: 1.25%;
+  margin-left: 5%;
+  margin-right: 5%;
 }
 
 .incoming_arc, .outgoing_arc {

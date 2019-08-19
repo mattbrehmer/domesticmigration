@@ -437,6 +437,14 @@ window.addEventListener('load', function() {
 
     gl.tilemap_instances[tilemap].query(query);
 
+    for (var i = 0; i < gl.queryNames.length; i++) {
+      if (gl.queryNames[i].field === query) {
+        console.log(i);
+        d3.select("#query_select_" + tilemap)
+          .property('selectedIndex', i);
+      }
+    }
+
     render();
 
   };
