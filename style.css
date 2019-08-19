@@ -99,22 +99,22 @@ select {
 @media screen 
 and (-webkit-min-device-pixel-ratio: 2) {
   .caption, p {
-    font-size: 1.2em;
+    font-size: 1em;
   }
 
   input[type=checkbox] {
-    -ms-transform: scale(2); /* IE */
-    -moz-transform: scale(2); /* FF */
-    -webkit-transform: scale(2); /* Safari and Chrome */
-    -o-transform: scale(2); /* Opera */
-    transform: scale(2);
-    padding: 10px;
+    -ms-transform: scale(1.25); /* IE */
+    -moz-transform: scale(1.25); /* FF */
+    -webkit-transform: scale(1.25); /* Safari and Chrome */
+    -o-transform: scale(1.25); /* Opera */
+    transform: scale(1.25);
+    padding: 5px;
   }
   
   .checkboxtext
   {
     /* Checkbox text */
-    font-size: 110%;
+    font-size: 1em;
     display: inline;
     padding-left: 0.25em;
 	  padding-right: 0.25em;
