@@ -473,6 +473,11 @@ window.addEventListener('load', function() {
     gl.loadQuery("2","AllQueries","inbound",false);
   }, 500);   
 
+  d3.selectAll('.single')
+    .style('position','absolute')
+    .style('margin-top','-100%')
+    .style('margin-left', '-100%');
+
 });
 
 //function to specify what happens when resizing the page, 
