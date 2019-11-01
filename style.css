@@ -1,4 +1,4 @@
-@charset "UTF-8";
+﻿@charset "UTF-8";
 
 body { 
   font-family: 'Lato',"Apple SD Gothic Neo", "Segoe UI Web Regular","wf_segoe-ui_normal","Segoe UI","Segoe UI Symbol","Myriad","Calibri","UnDotum","Damascus","Futura","Helvetica Neue","BBAlpha Sans","S60 Sans","Arial",sans-serif;
@@ -81,6 +81,10 @@ select {
 .example {
   color: skyblue;
   cursor: pointer;
+}
+
+span.strong {
+    font-weight: 600;
 }
 
 @media screen and (min-width: 506px) { 

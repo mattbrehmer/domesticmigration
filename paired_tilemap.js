@@ -543,7 +543,7 @@ paired_tilemap = function() {
               return d.properties.state + ' to ' + _.find(stateDetails, { 'state': selected_dest }).code + " has a";
             }
             else {
-              return (num_queries > 1) ? formatComma(num_queries) + ' searches' : 'No searches';
+                return (d.properties.state + ' to ' + _.find(stateDetails, { 'state': selected_dest }).code);
             }
           }
           else {
@@ -569,7 +569,7 @@ paired_tilemap = function() {
               return Math.round(num_queries) + ' : 1 housing to';
             }
             else {
-              return ('from ' + d.properties.state + ' for ' + _.find(stateDetails, { 'state': selected_dest }).code) + '.';
+                return (num_queries > 0) ? 'Score: ' + formatComma(num_queries) : '';
             }
           }
           else {
@@ -595,7 +595,7 @@ paired_tilemap = function() {
               return 'job search ratio.';
             }
             else {
-              return (num_queries > 1) ? 'Rank: ' + (origin_index + 1) + ' of 50.' : '';
+              return (num_queries > 1) ? 'Rank: ' + (origin_index + 1) + ' of 50' : '';
             }
           }
           else {
@@ -808,7 +808,7 @@ paired_tilemap = function() {
               return _.find(stateDetails, { 'state': selected_origin }).code + ' to ' + d.properties.state + " has a";
             }
             else {
-              return (num_queries > 1) ? (formatComma(num_queries) + ' searches') : 'No searches';
+              return _.find(stateDetails, { 'state': selected_origin }).code + ' to ' + d.properties.state;
             }         
           }
           else {
@@ -834,7 +834,7 @@ paired_tilemap = function() {
               return Math.round(num_queries) + ' : 1 housing to';
             }
             else {
-              return ('for ' + d.properties.state + ' from ' + _.find(stateDetails, { 'state': selected_origin }).code) + '.';
+                return (num_queries > 0) ? 'Score: ' + (formatComma(num_queries)) : '';
             }
           }
           else {
@@ -860,7 +860,7 @@ paired_tilemap = function() {
               return 'job search ratio.';
             }
             else {
-              return (num_queries > 1) ? 'Rank: ' + (dest_index + 1) + ' of 50.' : '';
+              return (num_queries > 1) ? 'Rank: ' + (dest_index + 1) + ' of 50' : '';
             }
           }
           else {
